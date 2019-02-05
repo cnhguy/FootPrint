@@ -1,11 +1,18 @@
 Week 5 Individual Report-Boya Cao
 
-
 Goals from last week: empty for first week
-Progress:- Build a sample plugin following the guide from IntelliJ- Conducted research on how to extract information from debuggers, and compared different type of debuggers- Looked for open source project to have a better understanding how the debuggers work to get the variable information and how the debuggers store them
-- We have successfully put a class in a debugger so that we can execute certain methods on our own, and we are able to get simple variable information from the debugger nowPlans and goals:- Test the code to see if it could store the value of more complicated data structure
 
-- Now the FootPrint extracts and stores value based on breakpoints, test if FootPrint could still extract and store the information even if there are bugs before breakpoints- figure out how to record record variable states of every line without setting breakpoints in every line. 
+Progress:
+- Build a sample plugin following the guide from IntelliJ
+- Conducted research on how to extract information from debuggers, and compared different type of debuggers
+- Looked for open source project to have a better understanding how the debuggers work to get the variable information and how the debuggers store them
+- We have successfully put a class in a debugger so that we can execute certain methods on our own, and we are able to get simple variable information from the debugger now
 
+Plans and goals:
+- Test the code to see if it could store the value of more complicated data structure
+- Now the FootPrint extracts and stores value based on breakpoints, test if FootPrint could still extract and store the information even if there are bugs before breakpoints
+- figure out how to record record variable states of every line without setting breakpoints in every line. 
 - Research whether the breakpoints could be set automatically.
-
+
+
+
