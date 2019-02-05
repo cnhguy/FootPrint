@@ -1,0 +1,14 @@
+1.
+2. I experimented with how we could extract the variable information from the debugger.
+   I learned about run configurations and running programs through extending Intellij's 
+   built in classes. I learned that we can initiate a custom debug action using a button,
+   through the Executor and Runner classes. I also learned that we can extract information
+   from the virtual machine about local variables, but only if the debug process reaches a 
+   breakpoint, and otherwise we can get information about fields at any point by setting
+   a watchpoint for them in the virtual machine. With the help of the others in the group,
+   I also was able to make a prototype system that can get the information we want, although
+   it is untested and extremely unpolished..
+3. For next week, I plan to try to learn more about ways we could get the information
+   about local variables that we want, perhaps through programatically setting breakpoints.
+   I also want to build a working prototype that is also able to get the local variable 
+   informationn at every line.
