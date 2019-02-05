@@ -1,0 +1,11 @@
+Goals from last week:
+	(empty for the first report)
+Progress:
+- Setup plugin architecture on git
+- Build a simple “Hello world” plugin for IntelliJ
+- Still have trouble understanding IntelliJ’s openapi and what libraries to be used for extending the built in debugger. From looking at other open source projects, it looks like we should extend the functionalities of a GenericDebuggerRunner class but since there are no documentation, I will find more examples online about this.
+- Found an example debugger written by IntelliJ for python in Java. Will study this to see if we can use any of their code to extract variable data 
+Plans and goals:
+- Flesh out architecture diagram
+- We were able to successfully get extra variable information from the debugger but I want to see if this will work for more complicated data structures like arrays or lists of objects
+- figure out how to record track when a variable has gone through a change (maybe set underlying breakpoints at every line before the user's breakpoint?)
