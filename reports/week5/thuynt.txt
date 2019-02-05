@@ -1,0 +1,25 @@
+First individual report; no previous goals.
+
+We were concerned about the difficulty of our project, especially since no one on the staff has done something
+similar before so we were told to create a prototype of our project. We managed to pull one together using
+Intellij’s openapi and JDI. Currently we have a plugin that runs the debugger and is able to extract local
+variable values in simple cases. Because there is zero documentation for the openapi, we found this process
+rather difficult. It involved a lot of just reading the code and trying to figure out what does what.
+We also found something called JDI (Java Debug Interface) that is used to write debuggers for Java.
+There are lots of tutorials and more documentation for this online so we integrated this into our
+approach as well. We’ve also found examples of people making plugins that manipulate the debugger
+on Intellij’s forum, which has been useful. Currently, our next challenge is to figure out how to
+efficiently store all the variable values at each step. The way it currently works, you have to set
+a breakpoint whenever you want to extract data. We were thinking that we would have to have breakpoints
+at every line of executed code in order to get all the variable’s history, but aren’t quite sure how
+to go about this. We were also hoping to store more than just local variables, but we haven’t found out
+how to do so yet.
+
+TO DO:
+
+•	Figure out how to extract variable values at each step/until execution is paused
+•	Figure out how to store them
+•	Possibly figure out how to store global variables, variables on the heap, etc.
+•	Decide on team assignments, who works on what, how we will communicate, etc.
+•	Decide on a UI later, draw some mockups for now, outline pros and cons
+
