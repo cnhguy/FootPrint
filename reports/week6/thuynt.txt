@@ -1,0 +1,31 @@
+Previous Goals:
+
+•	Figure out how to extract variable values at each step/until execution is paused
+•	Figure out how to store them
+•	Possibly figure out how to store global variables, variables on the heap, etc.
+•	Decide on team assignments, who works on what, how we will communicate, etc.
+•	Decide on a UI later, draw some mockups for now, outline pros and cons
+
+This Week:
+
+After our meeting with Martin, we've decided to look into watchpoints more as
+as opposed to setting breakpoints everywhere, which seemed very inefficient.
+We were also advised to separate the JDI code as the backend of our application and
+the frontend Intellij plugin so that it could connect with any debugger, but after
+further research on JDI and sockets, it seems rather difficult to do this
+due to race conditions and the way the Intellij debugger works but we will
+keep looking into it. Also, it seems JDI only offers watchpoint
+methods for field/instance variables and not local variables so this is
+another issue we would need to solve. In terms of implementation, we haven't
+made much progress beyond last week due to all the snow days and midterms,
+but we plan to pick up the slack in the coming weeks.
+
+Current Goals:
+
+•	Add watchpoints to our current FootPrint prototype
+•	Figure out how to store variable data
+•   Continue researching JDI
+•	Separate into Extractor and Cache teams and begin implementing these
+
+
+

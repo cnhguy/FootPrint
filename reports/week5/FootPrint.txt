@@ -1,0 +1,11 @@
+﻿1. Previous week’s plan: none for the first week
+2. This week’s progress:
+   1. Setup IntelliJ’s plugin files and added a button on IntelliJ’s IDE
+   2. Found IntelliJ’s Debugger API and JDI (Java Debugger Interface). We will be using these api’s methods to extract data from the debugger
+   3. Build a rough version of a Runner class to extract variable data from the debugger everytime we come across a breakpoint. We plan to do further investigation in order to allow the Runner to extract data without needing to come across a breakpoint.
+1. Next week’s plan:
+   1. Create all the necessary classes with empty methods and comments (i.e. create a spec)
+   2. Build version 1 of the Runner, Listener, and Extractor to just track the history of global fields up until a specific breakpoint
+1. Meeting agenda:
+   1. Discuss modifying the scope of our assignment from reverse debugging to displaying the history of variables
+   2. Discuss our architecture diagram
