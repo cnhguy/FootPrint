@@ -16,9 +16,11 @@ public class DebugAction extends AnAction{
     public void actionPerformed(AnActionEvent e) {
         RunnerAndConfigurationSettings config = RunManagerImpl.getInstanceEx(e.getProject())
                 .getSelectedConfiguration();
-        System.out.println(config.getName());
+        if (config != null) {
+            System.out.println(config.getName());
 
-        this.executeConfiguration(config, FootPrint_Executor.getMyExecutorInstance());
+            this.executeConfiguration(config, FootPrint_Executor.getMyExecutorInstance());
+        }
     }
 
     private static void executeConfiguration(@NotNull RunnerAndConfigurationSettings configuration,
