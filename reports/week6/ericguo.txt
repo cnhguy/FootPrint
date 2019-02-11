@@ -1,0 +1,15 @@
+1. For next week, I plan to try to learn more about ways we could get the information
+   about local variables that we want, perhaps through programatically setting breakpoints.
+   I also want to build a working prototype that is also able to get the local variable 
+   information at every line.
+2. This week, I dug more into the intellij debug api and found that we cannot build a
+   seperate backend and front end, as was suggested at our TA meeting. I found that
+   intellij's debug solution is build on using jdi and because we must use intellij's
+   debug api, it must be specific to that ide. I also transfered some files between the
+   test repository (myfootprint) and the project one, and cleaned up some comments. Also,
+   I found that we can easily get the states of field's, but it is much more difficult to
+   get the states of local variables because of how breakpoints are registered in the
+   virtual machine.
+3. For next week:
+    -build a prototype to get local variables
+    -investigate using watchpoints to achieve above
