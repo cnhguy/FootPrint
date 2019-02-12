@@ -1,0 +1,29 @@
+﻿1. My goals from last week were:
+* Complete architecture diagram 
+* See if the debugger can get information from more complicated structures like 
+  arrays or lists of objects
+* Figure out how to track when a variable has gone through a change
+
+
+2) I now have a clear picture of the different components that we need to build. More specifically, 
+our back end will consist of the following classes: 
+        Executor - indicates that we want to execute a debugging process
+        Runner - Creates a virtual machine and registers breakpoints/events that happened
+        Listener -Listens for breakpoints/events and notifies the extractor
+Extractor - Extracts variable information from the virtual machine
+Cache - Stores data
+UI - Displays data
+I also played around with the rough plugin class that we had last week and noticed some 
+interesting points. We can get variable information beyond the breakpoint if the “step into” 
+button is pressed. We also have access to more complicated objects (like Lists) in the 
+debugger but will probably have to implement our own toString() method if we want to display 
+the information correctly to the user. As for tracking when a variable has gone through a 
+change, it is not possible to do so before a breakpoint is set. Martin mentioned the concept 
+of setting watchpoints instead so I will look into this more as an alternative to tracking 
+variables via breakpoints.  
+
+
+3) Plans and goals:
+* Split the rough plugin into classes mentioned above. Currently all of them are 
+  combined together into one class.
+* Access watchpoint information from the virtual machine
