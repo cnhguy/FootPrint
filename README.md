@@ -34,11 +34,11 @@ The user wants to see how the variables sum  and i change throughout the for loo
  
 ## Instructions:
 
-Click the FootPrint icon, found in the upper right next to the regular Intellij Debugger icon. This should start the debugger for most recently executed program
-Then, select the variables you wish to monitor (simply click them in your code). FootPrint supports local variables and fields.
-Then, set any desired breakpoints as normal
-Run the debugger as normal
-In a separate pane in the debugger window, you should see a list of your selected variables. Clicking on a the name of one of these variables at any point in the debugging process will display their value history along with which line the value was updated from the start of the program up to whichever line you are currently at in the debugger.
-When you are finished, you can simply exit FootPrint by clicking the on the FootPrint pane.
+1) Click the FootPrint icon, found in the upper right next to the regular Intellij Debugger icon. This should start the debugger for most recently executed program
+2) Select the variables you wish to monitor (simply click them in your code). FootPrint supports local variables and fields.
+3) Set any desired breakpoints as normal
+4) Run the debugger as normal
+5) In a separate pane in the debugger window, you should see a list of your selected variables. Clicking on a the name of one of these variables at any point in the debugging process will display their value history along with which line the value was updated from the start of the program up to whichever line you are currently at in the debugger.
+6) When you are finished, you can simply exit FootPrint by clicking the on the FootPrint pane.
 
 Congrats! You have successfully used FootPrint.
