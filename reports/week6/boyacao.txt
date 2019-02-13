@@ -14,4 +14,4 @@ Plans and Goals:
 -See if watchpoints could help us set the breakpoints automatically.
 -Research and consult Martin whether we should try to record local variables and how we could do that.
 -Generate unit test cases from the very beginning.
--Start implementing the extractor and listener
+-Start implementing the extractor and listener.
