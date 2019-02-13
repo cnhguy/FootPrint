@@ -11,11 +11,15 @@ Example:
  
 Consider this scenario:
  
-Line 1     int sum = 0 ←---------- set a watchpoint here
-Line 2     for (int i = 0; i < 6; i++) { ←--- set a watchpoint here
-Line 3             sum += i;     
-Line 4     }
-Line 5     System.out.println(sum); 
+Line 1: int sum = 0 <- set watchpoint
+
+Line 2: for (int i = 0; i < 6; i++) { <- set watchpoint
+
+Line 3:    sum += i; 
+    
+Line 4: }
+
+Line 5: System.out.println(sum); 
  
 The user wants to see how the variables sum  and i change throughout the for loop. He or she will set a watch point on sum and i to track the changes that will happen to them. Alternatively, a user could proceed to any point in the program after line 5 and would still be able to look back at the histories of sum and i anytime. FootPrint records the different values that sum and i were previously assigned to create the following output for their histories:
  
