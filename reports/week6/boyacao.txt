@@ -1,0 +1,17 @@
+Goals from Week 5 :
+- Test the code to see if it could store the value of more complicated data structure
+- Now the FootPrint extracts and stores value based on breakpoints, test if FootPrint could still extract and store the information even if there are bugs before breakpoints
+- figure out how to record record variable states of every line without setting breakpoints in every line. 
+- Research whether the breakpoints could be set automatically.
+
+Progess:
+-Regarding what would happen when FootPrint runs into bugs before breakpoints: basically FootPrint will keep recording the states of a field until it reaches a breakpoint or it gets stopped with the debuggers automatically. The feature I imagined was that Footprint could show exactly what happens to the data structures when a bug is relevant to data structure. For example, assigning a value to a location that exceeds to capcaity of an array. At present, FootPrint could not show this but all the past states. If we have more timee, we will try to enhance FootPrint so that it could help debugging more insightfully.
+-Regarding the breakpoints: there is already a method that could set breakpoints everytime the value of the field get changed. After meeting with Martin on Thursday, we were introduced to the "WATCHPOINTS". Basically watchpoints will help record the variable states everytime a field get changed. However, watchpoint is helpful to single variable, it get messy when dealing with multivarible. Watchpoint is a concept we should compare with FootPrint.
+-Regarding the values we are recording: at present, the local variable could not be recorded, instead, we are recording the field values. Although we are focusing more on recording fields, but we are still working on whether we should store the local variable and how we could do it.
+-We built up the architecture of our project. We learned about how the IDE, JVM, executor, runner, listener, extractor, cache, and UI related and interacted with each other. Instead of assigning backend and frontend to subgroups, we now focused on the extractor and listener seperately.
+
+Plans and Goals:
+-See if watchpoints could help us set the breakpoints automatically.
+-Research and consult Martin whether we should try to record local variables and how we could do that.
+-Generate unit test cases from the very beginning.
+-Start implementing the extractor and listener
