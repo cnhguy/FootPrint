@@ -1,0 +1,18 @@
+1. Previous week’s plan: 
+ 	- Create all the necessary classes with empty methods and comments (i.e. create a spec)
+ 	- Build version 1 of the Runner, Listener, and Extractor to just track the history of global fields up until a specific breakpoint
+
+2. This week’s progress:
+	- Started implementing necessary classes for the Runner, listener and Extractor.
+   	- Built a simple model for the IDE talking to the JVM
+   	- Researched on the watchpoints to see if the breakpoints could be set automatically.
+   	- Since it is difficult to get local variables' information rather than recording the states of fields, we researched on how to record the information of local variables.
+   	- Researched more on the JDI
+
+3. Next week’s plan:
+ 	-Finish the build process of v1.0 Runner, Listener, and Extractor.
+ 	-Try record states of local variables.
+
+4. Meeting agenda:
+   1. Discuss possible approaches to access the states of local variables
+   2. Discuss how to utilize watchpoints to help FootPrint access information
