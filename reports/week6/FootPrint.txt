@@ -11,6 +11,7 @@
 
 3. Next week’s plan:
  	-Finish the build process of v1.0 Runner, Listener, and Extractor.
+ 	- Eric + Derek on Extractor, Hang + Audrey on Runner and Listener
  	-Try record states of local variables.
 
 4. Meeting agenda:
