@@ -17,7 +17,7 @@ public class DebugAction extends AnAction{
         RunnerAndConfigurationSettings config = RunManagerImpl.getInstanceEx(e.getProject())
                 .getSelectedConfiguration();
         if (config != null) {
-            System.out.println(config.getName());
+            System.out.println(config.getName()); // prints out the method's name
 
             this.executeConfiguration(config, FootPrint_Executor.getMyExecutorInstance());
         }
@@ -28,12 +28,12 @@ public class DebugAction extends AnAction{
         ExecutionEnvironmentBuilder builder;
         try {
             builder = ExecutionEnvironmentBuilder.create(executor, configuration);
+            builder.runner(new ProgramRunner());
         }
         catch (ExecutionException e) {
-//            LOG.error(e);
+            e.printStackTrace();
             return;
         }
-
         ProgramRunnerUtil.executeConfiguration(builder
                 .contentToReuse(null)
                 .dataContext(null)
