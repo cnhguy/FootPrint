@@ -1,3 +1,4 @@
+import com.intellij.debugger.engine.DebugProcess;
 import com.intellij.debugger.engine.DebuggerManagerThreadImpl;
 import com.intellij.debugger.engine.SuspendContextImpl;
 import com.intellij.debugger.impl.DebuggerContextImpl;
@@ -33,7 +34,8 @@ public class DebugListener implements DebuggerContextListener {
                 final StackFrameProxyImpl sfProxy = newContext.getFrameProxy();
 
                 if (newSuspendContext != null) {
-                    DebugExtractor extractor = new DebugExtractor(sfProxy);
+                    DebugProcess process = debuggerSession.getProcess();
+                    DebugExtractor extractor = new DebugExtractor(sfProxy, process);
                     DebuggerManagerThreadImpl managerThread = newSuspendContext.getDebugProcess()
                             .getManagerThread();
                     managerThread.invokeCommand(extractor);
