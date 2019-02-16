@@ -20,7 +20,7 @@ public class DebugProcessStarter extends XDebugProcessStarter {
     }
 
     /**
-     * Returns a Java debugger (??)
+     * Returns a Java debugger process
      * @param session
      * @return
      */

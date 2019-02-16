@@ -2,6 +2,7 @@ import com.intellij.debugger.engine.managerThread.DebuggerCommand;
 import com.intellij.debugger.jdi.DecompiledLocalVariable;
 import com.intellij.debugger.jdi.StackFrameProxyImpl;
 import com.sun.jdi.*;
+import com.sun.tools.jdi.ArrayReferenceImpl;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
@@ -55,13 +56,14 @@ public class DebugExtractor implements DebuggerCommand {
     @Override
     public void action() {
         try {
+
             // get a list of local variables from the current stack frame
-            StackFrame frame = sfProxy.getStackFrame();
+            StackFrame frame = sfProxy.getStackFrame(); // the stackframe of the line we are about to execute
             List<LocalVariable> visibleVariables = frame.visibleVariables();
 
             // Put visibleVariable's fields into DecompiledLocalVariables for formatting later on
             // We can also write our own version of the DecompiledLocalVariables class
-            // to decide how the variables are displayed
+            // to decide how the variables are displayed (?)
             Collection<DecompiledLocalVariable> vars = new ArrayList<>();
             int slot = 0;
             for (LocalVariable visibleVariable : visibleVariables) {
@@ -71,17 +73,15 @@ public class DebugExtractor implements DebuggerCommand {
                         visibleVariable.signature(), names));
                 slot++;
 
-//                System.out.println();
-//                System.out.println("Local Variable");
-//                System.out.println("name: " + visibleVariable.name());
-//                System.out.println("signature: " + visibleVariable.signature());
-//                System.out.println("type: " + visibleVariable.type());
-//                System.out.println("typeName: " + visibleVariable.typeName());
-//                System.out.println("genericSignature: " + visibleVariable.genericSignature());
-//                System.out.println("isArgument(): " + visibleVariable.isArgument());
+                System.out.println();
+                System.out.println("Local Variable");
+                System.out.println("name: " + visibleVariable.name()); // gives the name
+                System.out.println("signature: " + visibleVariable.signature()); // type initial
+                System.out.println("type: " + visibleVariable.type()); // gives detailed type. Ex: interface java.util.List (no class loader)
+                System.out.println("typeName: " + visibleVariable.typeName()); // the complete type name. Ex: java.util.List, java.lang.String, int[]
+                System.out.println("genericSignature: " + visibleVariable.genericSignature()); // returns null for primitive. Contains name, return type, parameters. Prob not needed
+                System.out.println("isArgument(): " + visibleVariable.isArgument()); // is it a parameter
             }
-
-//                                    vars.forEach(d -> System.out.println(d.getDefaultName()));
 
             Field frameIdField = frame.getClass().getDeclaredField("id");
             frameIdField.setAccessible(true);
@@ -112,24 +112,41 @@ public class DebugExtractor implements DebuggerCommand {
             for (DecompiledLocalVariable var : vars) {
                 Value value = values[idx];
                 String valueAsString = null;
-                //Type valueType = (null == value) ? null : value.type();
                 if (value != null) {
-                    // Commented code is trying to display arrays as [v, v, v] format
                     valueAsString = value.toString();
-//                                            if (value instanceof ArrayReferenceImpl & var.getSignature().equals("[Ljava/lang/String;"))
-//                                            {
-//                                                ArrayReferenceImpl valueAsArray = (ArrayReferenceImpl)value;
-//                                                List<StringReferenceImpl> arrayValues = (List<StringReferenceImpl>) valueAsArray.getValues();
-//                                                valueAsString = "[";
-//                                                for (StringReferenceImpl arrayValue:arrayValues) {
-//                                                    valueAsString += arrayValue + ",";
-//                                                }
-//                                                if (arrayValues.size() > 0) { // remove last comma
-//                                                    valueAsString = valueAsString.substring(0, valueAsString.length() - 1);
-//                                                }
-//                                                valueAsString += "]";
-//                                            }
+
+                    // If the value is an array, print it out in array format --> [x, y, z]
+                    if (value instanceof ArrayReferenceImpl)
+                    {
+                        ArrayReferenceImpl valueAsArray = (ArrayReferenceImpl) value;
+                        int length = valueAsArray.length();
+                        valueAsString = "[";
+                        for (int i = 0; i < length - 1; i++) {
+                            valueAsString += valueAsArray.getValue(i) + ", ";
+                        }
+
+                        // append the last element without the comma
+                        if (length > 0) {
+                            valueAsString += valueAsArray.getValue(length - 1);
+                        }
+                        valueAsString += "]";
+                    }
+
+//                            else if (value instanceof ObjectReferenceImpl && var.getSignature().equals("Ljava/util/List;")) {
+//                                ObjectReferenceImpl valueAsObject = (ObjectReferenceImpl) value;
+//                                Type type = valueAsObject.type();
+//                                ReferenceType referenceType = valueAsObject.referenceType();
+//                                System.out.println("referencType to string: " + referenceType.classObject().toString());
+//                                List<com.sun.jdi.Method> methods = referenceType.methodsByName("toString");
+//                                System.out.println("methods: " + methods.toString());
+//                                // get the fields. Might be useful for displaying complex objects later on
+//                                List<com.sun.jdi.Field> fields = referenceType.allFields();
+//                                System.out.println("fields: " + fields.toString());
+//                                // List<Object> list = (List<Object>) value;
+//
+//                            }
                 }
+                System.out.println();
                 System.out.println(var.getDisplayName() + ":" + valueAsString);
                 //msg.append(var.getSlot() + ":" + var.getName() + ":" + valueType + ":" + valueAsString + ":" + var.getSignature() + "\n");
 
