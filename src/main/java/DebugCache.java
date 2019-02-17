@@ -12,12 +12,21 @@ import java.util.Map;
  * values are only cached if they have changed.
  */
 public class DebugCache {
+
+    private static DebugCache debugCache;
+
     private Map<String, LinkedList<VariableInfo>> vars;
 
-    public DebugCache() {
+    private DebugCache() {
         vars = new HashMap<String, LinkedList<VariableInfo>>();
     }
 
+    public static DebugCache getInstance() {
+        if (debugCache == null) {
+            debugCache = new DebugCache();
+        }
+        return debugCache;
+    }
     public List<VariableInfo> get(String var) {
         return vars.get(var);
     }
@@ -32,6 +41,10 @@ public class DebugCache {
             info.add(update);
             vars.put(name, info);
         }
+    }
+
+    public void clear() {
+        vars = new HashMap<String, LinkedList<VariableInfo>>();
     }
 
     public String toString() {
