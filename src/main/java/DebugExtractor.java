@@ -16,23 +16,41 @@ public class DebugExtractor implements DebuggerCommand {
 
     private StackFrameProxyImpl frameProxy;
     private DebugProcess debugProcess;
+    private DebugCache cache;
 
-    public DebugExtractor(StackFrameProxyImpl frameProxy, DebugProcess debugProcess) {
+    public DebugExtractor(StackFrameProxyImpl frameProxy, DebugProcess debugProcess, DebugCache cache) {
         this.frameProxy = frameProxy;
         this.debugProcess = debugProcess;
+        this.cache = cache;
     }
 
     @Override
     public void action() {
         try {
-            System.out.println("current line number: " + frameProxy.location());
+            //System.out.println("current line number: " + frameProxy.location());
             // used intelliJ's LocalVariablesUtil to fetch variables in the current stackframe
             Map<DecompiledLocalVariable, Value> map = LocalVariablesUtil.fetchValues(frameProxy, debugProcess, true);
-
+            map.forEach(((decompiledLocalVariable, value) -> updateCache(decompiledLocalVariable, value)));
+            System.out.println(cache);
             // for each local variable that we fetched, print out its value
-            map.forEach(((decompiledLocalVariable, value) -> printValue(decompiledLocalVariable, value)));
+            //map.forEach(((decompiledLocalVariable, value) -> printValue(decompiledLocalVariable, value)));
 
             System.out.println("---------------");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void updateCache(DecompiledLocalVariable var, Value val) {
+        try {
+            String varName = StringUtil.join(var.getMatchedNames(), " | ");
+            VariableInfo info = cache.get(varName);
+            if(info == null) {
+                info = new VariableInfo();
+            }
+            info.update(frameProxy.location().lineNumber(), val);
+            cache.put(varName, info);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -43,7 +61,7 @@ public class DebugExtractor implements DebuggerCommand {
 
     }
 
-    private void printValue(DecompiledLocalVariable var, Value value) {
+    /*private void printValue(DecompiledLocalVariable var, Value value) {
         String valueAsString = null;
         if (value != null) {
             valueAsString = value.toString();
