@@ -7,6 +7,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.sun.jdi.*;
 import com.sun.tools.jdi.ArrayReferenceImpl;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -44,13 +45,7 @@ public class DebugExtractor implements DebuggerCommand {
     private void updateCache(DecompiledLocalVariable var, Value val) {
         try {
             String varName = StringUtil.join(var.getMatchedNames(), " | ");
-            VariableInfo info = cache.get(varName);
-            if(info == null) {
-                info = new VariableInfo();
-            }
-            info.update(frameProxy.location().lineNumber(), val);
-            cache.put(varName, info);
-
+            cache.put(varName, frameProxy.location().lineNumber(), val);
         } catch (Exception e) {
             e.printStackTrace();
         }
