@@ -29,3 +29,6 @@ patchPluginXml {
 intellij {
     sandboxDirectory = "$project.buildDir/myCustom-sandbox"
 }
+apply plugin: 'idea'
+apply plugin: 'org.jetbrains.intellij'
+apply plugin: 'java'
