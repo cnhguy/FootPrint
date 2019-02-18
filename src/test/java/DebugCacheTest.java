@@ -1,8 +1,13 @@
+import org.junit.Before;
 import org.junit.Test;
 
 public class DebugCacheTest {
 
-    DebugCache cache = new DebugCache();
+    @Before
+    public void setUp() {
+        DebugCache cache = DebugCache.getInstance();
+        cache.clear();
+    }
 
     @Test
     public void testGet() {
