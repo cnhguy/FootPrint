@@ -8,6 +8,8 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 
 public class FootPrintToolWindow {
+    private static final FootPrintToolWindow INSTANCE = new FootPrintToolWindow();
+
     private GridLayout layout;
     private JPanel content;
     private JScrollPane leftScrollPane;
@@ -15,8 +17,9 @@ public class FootPrintToolWindow {
     private JScrollPane rightScrollPane;
     private JTable rightTable;
 
+    public static FootPrintToolWindow getInstance() {return INSTANCE;}
 
-    public FootPrintToolWindow (ToolWindow toolWindow) {
+    private FootPrintToolWindow () {
         initComponents();
     }
 
