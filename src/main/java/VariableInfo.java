@@ -13,11 +13,19 @@ public class VariableInfo {
         this.value = valueAsString(value);
     }
 
+    public int getLine() {
+        return line;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
     public String toString() {
         return "line: " + line + ", value: " + value;
     }
 
-    public String valueAsString(Value value) {
+    private String valueAsString(Value value) {
         String valueAsString = null;
         if (value != null) {
             valueAsString = value.toString();
