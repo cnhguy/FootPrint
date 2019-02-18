@@ -1,37 +1,23 @@
 import com.sun.jdi.Value;
 import com.sun.tools.jdi.ArrayReferenceImpl;
-import java.util.LinkedList;
 
 /**
- * Variable info holds the values and line numbers at which the value was changed.
+ * Variable info holds a value and the line number at which it was assigned.
  */
 public class VariableInfo {
-    private LinkedList<Integer> lines;
-    private LinkedList<Value> values;
+    private int line;
+    private String value;
 
-    public VariableInfo() {
-        this.lines = new LinkedList<Integer>();
-        this.values = new LinkedList<Value>();
-    }
-
-    public void update(Integer line, Value value) {
-        // only update if the value has changed
-        if(values.size() == 0 || !values.getLast().equals(value)) {
-            lines.add(line);
-            values.add(value);
-        }
+    public VariableInfo(int line, Value value) {
+        this.line = line;
+        this.value = valueAsString(value);
     }
 
     public String toString() {
-        String res = "VALUES: ";
-        for(Value value : values) {
-            res += valueAsString(value) + ", ";
-        }
-        res += "\nLINES: " + lines;
-        return res;
+        return "line: " + line + ", value: " + value;
     }
 
-    public String valueAsString(Value value) {
+    private String valueAsString(Value value) {
         String valueAsString = null;
         if (value != null) {
             valueAsString = value.toString();
@@ -51,5 +37,41 @@ public class VariableInfo {
             }
         }
         return valueAsString;
+    }
+
+    /**
+     * Returns the value in string format
+     * @return the value
+     */
+    public String getValue() {
+        return value;
+    }
+  
+    /**
+     * Returns the line number this change was made on
+     * @return the line number
+     */
+    public int getLine() {
+        return line;
+    }
+
+    public boolean equals(Object o) {
+
+        // If the object is compared with itself then return true
+        if (o == this) {
+            return true;
+        }
+
+        /* Check if o is an instance of Complex or not
+          "null instanceof [type]" also returns false */
+        if (!(o instanceof VariableInfo)) {
+            return false;
+        }
+
+        // typecast o to Complex so that we can compare data members
+        VariableInfo c = (VariableInfo) o;
+
+        // Compare the data members and return accordingly
+        return this.value.equals(c.value);
     }
 }

@@ -7,6 +7,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.sun.jdi.*;
 import com.sun.tools.jdi.ArrayReferenceImpl;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,10 +19,10 @@ public class DebugExtractor implements DebuggerCommand {
     private DebugProcess debugProcess;
     private DebugCache cache;
 
-    public DebugExtractor(StackFrameProxyImpl frameProxy, DebugProcess debugProcess, DebugCache cache) {
+    public DebugExtractor(StackFrameProxyImpl frameProxy, DebugProcess debugProcess) {
         this.frameProxy = frameProxy;
         this.debugProcess = debugProcess;
-        this.cache = cache;
+        this.cache = DebugCache.getInstance();
     }
 
     @Override
@@ -33,7 +34,7 @@ public class DebugExtractor implements DebuggerCommand {
             map.forEach(((decompiledLocalVariable, value) -> updateCache(decompiledLocalVariable, value)));
             System.out.println(cache);
             // for each local variable that we fetched, print out its value
-            //map.forEach(((decompiledLocalVariable, value) -> printValue(decompiledLocalVariable, value)));
+            // map.forEach(((decompiledLocalVariable, value) -> printValue(decompiledLocalVariable, value)));
 
             System.out.println("---------------");
         } catch (Exception e) {
@@ -44,13 +45,7 @@ public class DebugExtractor implements DebuggerCommand {
     private void updateCache(DecompiledLocalVariable var, Value val) {
         try {
             String varName = StringUtil.join(var.getMatchedNames(), " | ");
-            VariableInfo info = cache.get(varName);
-            if(info == null) {
-                info = new VariableInfo();
-            }
-            info.update(frameProxy.location().lineNumber(), val);
-            cache.put(varName, info);
-
+            cache.put(varName, frameProxy.location().lineNumber(), val);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -61,7 +56,18 @@ public class DebugExtractor implements DebuggerCommand {
 
     }
 
-    /*private void printValue(DecompiledLocalVariable var, Value value) {
+/*    private void printValue(DecompiledLocalVariable var, Value value) {
+        System.out.println("-----");
+        System.out.println("display name: " + var.getDisplayName());
+        System.out.println("default name: " + var.getDefaultName());
+        System.out.println("signature: " + var.getSignature());
+        System.out.println("matched names: " + var.getMatchedNames());
+        System.out.println("slot: " + var.getSlot());
+        System.out.println("decompiled local variable toString: " + var.toString());
+
+
+
+
         String valueAsString = null;
         if (value != null) {
             valueAsString = value.toString();

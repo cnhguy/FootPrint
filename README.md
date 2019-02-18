@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/cnhguy/FootPrint.svg?branch=master)](https://travis-ci.com/cnhguy/FootPrint)
+
 # FootPrint
 
 
