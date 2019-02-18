@@ -13,10 +13,8 @@ import org.jetbrains.annotations.NotNull;
 public class DebugListener implements DebuggerContextListener {
 
     private DebuggerSession debuggerSession;
-    private DebugCache cache;
 
     public DebugListener(DebuggerSession debuggerSession) {
-        this.cache = new DebugCache();
         this.debuggerSession = debuggerSession;
     }
 
@@ -37,7 +35,7 @@ public class DebugListener implements DebuggerContextListener {
 
                 if (newSuspendContext != null) {
                     DebugProcess process = debuggerSession.getProcess();
-                    DebugExtractor extractor = new DebugExtractor(sfProxy, process, cache);
+                    DebugExtractor extractor = new DebugExtractor(sfProxy, process);
                     DebuggerManagerThreadImpl managerThread = newSuspendContext.getDebugProcess()
                             .getManagerThread();
                     managerThread.invokeCommand(extractor);

@@ -19,10 +19,10 @@ public class DebugExtractor implements DebuggerCommand {
     private DebugProcess debugProcess;
     private DebugCache cache;
 
-    public DebugExtractor(StackFrameProxyImpl frameProxy, DebugProcess debugProcess, DebugCache cache) {
+    public DebugExtractor(StackFrameProxyImpl frameProxy, DebugProcess debugProcess) {
         this.frameProxy = frameProxy;
         this.debugProcess = debugProcess;
-        this.cache = cache;
+        this.cache = DebugCache.getInstance();
     }
 
     @Override
@@ -34,7 +34,7 @@ public class DebugExtractor implements DebuggerCommand {
             map.forEach(((decompiledLocalVariable, value) -> updateCache(decompiledLocalVariable, value)));
             System.out.println(cache);
             // for each local variable that we fetched, print out its value
-            //map.forEach(((decompiledLocalVariable, value) -> printValue(decompiledLocalVariable, value)));
+            // map.forEach(((decompiledLocalVariable, value) -> printValue(decompiledLocalVariable, value)));
 
             System.out.println("---------------");
         } catch (Exception e) {
@@ -56,7 +56,18 @@ public class DebugExtractor implements DebuggerCommand {
 
     }
 
-    /*private void printValue(DecompiledLocalVariable var, Value value) {
+/*    private void printValue(DecompiledLocalVariable var, Value value) {
+        System.out.println("-----");
+        System.out.println("display name: " + var.getDisplayName());
+        System.out.println("default name: " + var.getDefaultName());
+        System.out.println("signature: " + var.getSignature());
+        System.out.println("matched names: " + var.getMatchedNames());
+        System.out.println("slot: " + var.getSlot());
+        System.out.println("decompiled local variable toString: " + var.toString());
+
+
+
+
         String valueAsString = null;
         if (value != null) {
             valueAsString = value.toString();
