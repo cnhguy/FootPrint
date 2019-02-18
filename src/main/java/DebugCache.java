@@ -1,9 +1,6 @@
 import com.sun.jdi.Value;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Cache that holds info about local variables on the stack. Maps the name
@@ -18,7 +15,7 @@ public class DebugCache {
     private Map<String, LinkedList<VariableInfo>> vars;
 
     private DebugCache() {
-        vars = new HashMap<String, LinkedList<VariableInfo>>();
+        vars = new HashMap<>();
     }
 
     public static DebugCache getInstance() {
@@ -27,14 +24,42 @@ public class DebugCache {
         }
         return debugCache;
     }
-    public List<VariableInfo> get(String var) {
+
+
+    /**
+     * Returns the history of the var
+     * @param var the variable name
+     * @return the history of the variable's values
+     */
+    public List<VariableInfo> getHistory(String var) {
         return vars.get(var);
+    }
+
+    /**
+     * Returns all the variables in the cache
+     * @return all the variables in the cache
+     */
+    public List<String> getAllVariables() {
+        return new ArrayList<>(vars.keySet());
+    }
+
+
+    /**
+     * Returns the most recent update that was made to the variable
+     * @param var the variable
+     * @return the most recent update that was made to the variable
+     */
+    public VariableInfo getMostRecentUpdate(String var) {
+        if (vars.containsKey(var)) {
+            return vars.get(var).getLast();
+        }
+        return null;
     }
 
     public void put(String name, Integer line, Value value) {
         LinkedList<VariableInfo> info = vars.get(name);
         if(info == null) {
-            info = new LinkedList<VariableInfo>();
+            info = new LinkedList<>();
         }
         VariableInfo update = new VariableInfo(line, value);
         if(info.size() == 0 || !update.equals(info.getLast())) {

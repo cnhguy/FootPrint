@@ -5,19 +5,21 @@ import com.sun.tools.jdi.ArrayReferenceImpl;
  * Variable info holds a value and the line number at which it was assigned.
  */
 public class VariableInfo {
-    private Integer line;
+    private int line;
     private String value;
 
-    public VariableInfo(Integer line, Value value) {
+    public VariableInfo(int line, Value value) {
         this.line = line;
         this.value = valueAsString(value);
     }
 
+    @Override
     public String toString() {
         return "line: " + line + ", value: " + value;
     }
 
-    public String valueAsString(Value value) {
+
+    private String valueAsString(Value value) {
         String valueAsString = null;
         if (value != null) {
             valueAsString = value.toString();
@@ -37,6 +39,21 @@ public class VariableInfo {
             }
         }
         return valueAsString;
+    }
+
+    /**
+     * Returns the value in string format
+     * @return the value
+     */
+    public String getValue() {
+        return value;
+    }
+    /**
+     * Returns the line number this change was made on
+     * @return the line number
+     */
+    public int getLineNumber() {
+        return line;
     }
 
     public boolean equals(Object o) {
