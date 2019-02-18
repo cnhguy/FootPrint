@@ -13,11 +13,9 @@ public class VariableInfo {
         this.value = valueAsString(value);
     }
 
-    @Override
     public String toString() {
         return "line: " + line + ", value: " + value;
     }
-
 
     private String valueAsString(Value value) {
         String valueAsString = null;
@@ -48,11 +46,12 @@ public class VariableInfo {
     public String getValue() {
         return value;
     }
+  
     /**
      * Returns the line number this change was made on
      * @return the line number
      */
-    public int getLineNumber() {
+    public int getLine() {
         return line;
     }
 
