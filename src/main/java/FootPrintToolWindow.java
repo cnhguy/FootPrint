@@ -1,12 +1,19 @@
 import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.ui.components.JBScrollPane;
+import com.intellij.ui.table.JBTable;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 
 public class FootPrintToolWindow {
     private GridLayout layout;
     private JPanel content;
-    private JLabel label;
+    private JScrollPane leftScrollPane;
+    private JTable leftTable;
+    private JScrollPane rightScrollPane;
+    private JTable rightTable;
 
 
     public FootPrintToolWindow (ToolWindow toolWindow) {
@@ -18,11 +25,26 @@ public class FootPrintToolWindow {
         content = new JPanel();
         content.setLayout(layout);
 
-        label =  new JLabel("hi");
-        content.add(label);
+        leftTable = new JBTable();
+        leftTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        leftTable.setRowSelectionAllowed(true);
+        leftTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                updateRightTable(leftTable.getSelectedRow());
+            }
+        });
+        leftScrollPane = new JBScrollPane(leftTable);
+        content.add(leftScrollPane);
 
-        content.add(new JButton("fdasfjdas"));
+        rightTable = new JBTable();
+        rightScrollPane = new JBScrollPane(rightTable);
+        content.add(rightScrollPane);
 
+    }
+
+    private void updateRightTable(int leftTableRow) {
+        System.out.println("update right table with row: " + leftTableRow);
     }
 
    public JPanel getContent() {

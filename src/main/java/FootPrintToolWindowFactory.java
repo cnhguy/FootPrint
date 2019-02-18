@@ -12,6 +12,7 @@ public class FootPrintToolWindowFactory implements ToolWindowFactory {
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
         Content content = contentFactory.createContent(fToolWindow.getContent(), "", false);
         toolWindow.getContentManager().addContent(content);
+        toolWindow.hide(null);
     }
 
     @Override
