@@ -10,6 +10,8 @@ import java.awt.*;
 public class FootPrintToolWindow {
     private static final FootPrintToolWindow INSTANCE = new FootPrintToolWindow();
 
+    private DebugCache cache;
+
     private GridLayout layout;
     private JPanel content;
     private JScrollPane leftScrollPane;
@@ -43,6 +45,21 @@ public class FootPrintToolWindow {
         rightTable = new JBTable();
         rightScrollPane = new JBScrollPane(rightTable);
         content.add(rightScrollPane);
+
+    }
+
+    /**
+     * Set the DebugCache
+     * @param cache
+     */
+    public void setCache(DebugCache cache) {
+        this.cache = cache;
+    }
+
+    /**
+     * The set DebugCache should calls this method to notify this class of a change in the cache and to update accordingly
+     */
+    public void cacheChanged() {
 
     }
 

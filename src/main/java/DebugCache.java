@@ -12,10 +12,12 @@ public class DebugCache {
 
     private static DebugCache debugCache;
 
+    private FootPrintToolWindow toolWindow = FootPrintToolWindow.getInstance();
     private Map<String, LinkedList<VariableInfo>> vars;
 
     private DebugCache() {
         vars = new HashMap<>();
+        toolWindow.setCache(this);
     }
 
     public static DebugCache getInstance() {
@@ -66,6 +68,7 @@ public class DebugCache {
             info.add(update);
             vars.put(name, info);
         }
+        toolWindow.cacheChanged();
     }
 
     public void clear() {
