@@ -1,0 +1,35 @@
+Previous Goals:
+
+•	Add watchpoints to our current FootPrint prototype
+•	Figure out how to store variable data
+•   Continue researching JDI
+•	Separate into Extractor and Cache teams and begin implementing these
+
+This Week:
+
+We split our code into separate classes for Cache, Extractor, Listener, etc.
+We also added some test classes for DebugCache and VariableInfo. We have
+the basic implementation of our classes complete and have started on the UI
+so we can have a working demo. Currently FootPrint will only extract the
+variable data when the debugger is suspended. The watches in intellij
+actually were not that useful. It doesn't suspend the debugger
+or anything when the watched variable changes. They're more for
+evaluating expressions so we haven't been able to use them in our
+implementation and the user will still need to set breakpoints. We do plan to add field
+watchpoints which are different from watches though. We are able to access
+local variables through the Intellij API each time the debugger is suspended.
+We are currently working on how to deal with objects (e.g. what info to store, how to display)
+
+Goals:
+
+- add more tests for all classes
+- add field watchpoints
+- add documentation
+- deal with objects, how to store, how to display
+- continue working on UI
+
+
+
+
+
+

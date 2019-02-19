@@ -1,0 +1,24 @@
+1) Goals from last week:
+- Split the rough plugin into classes (Executor, Listener, Runner, Extractor, Cache). 
+Currently all of them are combined together into one class.
+- Access watchpoint information from the virtual machine
+
+2) Progress:
+
+- Split plugin into classes (Executor, Listener, Runner, Extractor, Cache)
+- Found IntelliJ's API for extracting variables on the stackframe and 
+  completed the Extractor class. Since we now have access to these
+  variables, we have decided to not pursue watchpoints anymore. 
+- Able to print the contents of primitives, arrays, and 
+  object's fields values
+- Stuck on extracting the contents of Collection variables. Currently,
+  we can only print the object's address, not what's inside it. 
+- Completed a rough version of the cache (will need to do additional testing
+  to verify functionality)
+
+
+3) Goals for next week:
+- Complete VariableInfo class to give the UI all the information it needs
+  to display to the user (ex: Object's fields and value in a readable format, )
+- Test cache and extractor for the back end
+- Add comments to classes
