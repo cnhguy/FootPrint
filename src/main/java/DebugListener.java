@@ -25,6 +25,7 @@ public class DebugListener implements DebuggerContextListener {
      */
     @Override
     public void changeEvent(@NotNull DebuggerContextImpl newContext, DebuggerSession.Event event) {
+        System.out.println(event.toString());
             if (event == DebuggerSession.Event.PAUSE
                     || event == DebuggerSession.Event.CONTEXT
                     || event == DebuggerSession.Event.REFRESH

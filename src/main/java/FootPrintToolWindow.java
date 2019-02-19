@@ -7,6 +7,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.lang.Object.*;
+import java.util.List;
 import javax.swing.table.DefaultTableModel;
 
 public class FootPrintToolWindow {
@@ -36,12 +37,7 @@ public class FootPrintToolWindow {
         leftTable = new JBTable(new DefaultTableModel(new Object[]{"Variables"}, 0));
         leftTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         leftTable.setRowSelectionAllowed(true);
-        leftTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                updateRightTable(leftTable.getSelectedRow());
-            }
-        });
+        leftTable.getSelectionModel().addListSelectionListener(e -> updateRightTable(leftTable.getSelectedRow()));
 
         leftScrollPane = new JBScrollPane(leftTable);
         content.add(leftScrollPane);
@@ -60,15 +56,16 @@ public class FootPrintToolWindow {
         this.cache = cache;
     }
 
+    private List<String> vars;
     /**
      * The set DebugCache should calls this method to notify this class of a change in the cache and to update accordingly
      **/
     public void cacheChanged() {
         DefaultTableModel leftTableModel = (DefaultTableModel)leftTable.getModel();
-        leftTable.setVisible(true);
-       leftTableModel.setRowCount(0);
-        for(int i=0; i<cache.getAllVariables().size();i++) {
-            Object[] rowData = {cache.getAllVariables().get(i)};
+        leftTableModel.setRowCount(0);
+        vars = cache.getAllVariables();
+        for(int i = 0; i < vars.size(); i++) {
+            Object[] rowData = {vars.get(i)};
             leftTableModel.addRow(rowData);
         }
 
@@ -77,13 +74,17 @@ public class FootPrintToolWindow {
 
 
     private void updateRightTable(int leftTableRow) {
-        System.out.println("update right table with row: " + leftTableRow);
+        if (leftTableRow < 0)
+            return;
+//        System.out.println("update right table with row: " + leftTableRow);
         //link the leftTableRow to the Variable it is referring to
         DefaultTableModel rightTableModel = (DefaultTableModel)rightTable.getModel();
         rightTableModel.setRowCount(0);
-        String leftTableVariable = cache.getAllVariables().get(leftTableRow);
-        for(int i=0; i<cache.getHistory(leftTableVariable).size();i++) {
-            Object[] rowData = {cache.getHistory(leftTableVariable).get(i).getLine(),cache.getHistory(leftTableVariable).get(i).getValue()};
+        String leftTableVariable = vars.get(leftTableRow);
+
+        List<VariableInfo> history = cache.getHistory(leftTableVariable);
+        for(int i = 0; i < history.size(); i++) {
+            Object[] rowData = {history.get(i).getLine(), history.get(i).getValue()};
             rightTableModel.addRow(rowData);
         }
         //Updating from getMostRecentUpdate

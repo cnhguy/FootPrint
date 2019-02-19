@@ -34,7 +34,7 @@ public class DebugCache {
      * @return the history of the variable's values
      */
     public List<VariableInfo> getHistory(String var) {
-        return vars.get(var);
+        return (List<VariableInfo>) vars.get(var).clone();
     }
 
     /**
