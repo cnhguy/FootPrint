@@ -1,0 +1,15 @@
+Goals from Week 6:
+-See if watchpoints could help us set the breakpoints automatically.
+-Research and consult Martin whether we should try to record local variables and how we could do that.
+-Generate unit test cases from the very beginning.
+-Start implementing the extractor and listener.
+
+Progress:
+-We split our group into backend and frontend. Eric and I worked on the frontend. We built a simple prototype for the FootPrint frontend which could interact with the cache in the backend.
+-Eric set up the FootPrintToolWindow and FootPrintToolWindowFactory, which are the key classes for building the interface. I worked on the part that passing the value from the cache to the user interface. \
+-The user interface is working properly in displaying all the variables, lines and values. 
+
+Plans and Goals:
+-Right now the line numbers are displayed in a wrong way: they are displaying the breakpoints' line numbers instead of the actual line numbers that the varibles change. We are trying to solve this.
+-Try to implement getMostRecentUpdate into the user interface
+-Try to display and test more complicated cases
