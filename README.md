@@ -69,6 +69,8 @@ Congrats! You have successfully used FootPrint.
 ## Dependencies:
 
 * [Java 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
+* [Gradle 4.0+](https://gradle.org/install/)
+
 
 ## Cloning The Repository:
 
@@ -81,8 +83,6 @@ Congrats! You have cloned the repository.
 
 ## Build and Test:
 
-FootPrint uses Gradle as its build system. If you already have Gradle installed on your machine, you can run `gradle build`.
-
-However, a wrapper is provided to you so simply running `./gradlew build` will work as well, regardless if Gradle is installed.
+FootPrint uses Gradle as its build system. Once you have Gradle installed on your machine, you can run `gradle build`.
 
 These commands will build the project and run any tests in the `/src/test/` folder.
