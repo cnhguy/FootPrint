@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 public class FootPrintToolWindowFactory implements ToolWindowFactory {
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
+//        System.out.println("createToolWindowContent");
         FootPrintToolWindow fToolWindow = FootPrintToolWindow.getInstance();
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
         Content content = contentFactory.createContent(fToolWindow.getContent(), "", false);

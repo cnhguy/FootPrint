@@ -26,21 +26,24 @@ public class DebugListener implements DebuggerContextListener {
     @Override
     public void changeEvent(@NotNull DebuggerContextImpl newContext, DebuggerSession.Event event) {
         System.out.println(event.toString());
-            if (event == DebuggerSession.Event.PAUSE
-                    || event == DebuggerSession.Event.CONTEXT
-                    || event == DebuggerSession.Event.REFRESH
-                    || event == DebuggerSession.Event.REFRESH_WITH_STACK
-                    && debuggerSession.isPaused()) {
-                final SuspendContextImpl newSuspendContext = newContext.getSuspendContext();
-                final StackFrameProxyImpl sfProxy = newContext.getFrameProxy();
+        if (event == DebuggerSession.Event.ATTACHED) {
+            DebugCache.getInstance().clear();
+        }
+        if (event == DebuggerSession.Event.PAUSE
+                || event == DebuggerSession.Event.CONTEXT
+                || event == DebuggerSession.Event.REFRESH
+                || event == DebuggerSession.Event.REFRESH_WITH_STACK
+                && debuggerSession.isPaused()) {
+            final SuspendContextImpl newSuspendContext = newContext.getSuspendContext();
+            final StackFrameProxyImpl sfProxy = newContext.getFrameProxy();
 
-                if (newSuspendContext != null) {
-                    DebugProcess process = debuggerSession.getProcess();
-                    DebugExtractor extractor = new DebugExtractor(sfProxy, process);
-                    DebuggerManagerThreadImpl managerThread = newSuspendContext.getDebugProcess()
-                            .getManagerThread();
-                    managerThread.invokeCommand(extractor);
-                }
+            if (newSuspendContext != null) {
+                DebugProcess process = debuggerSession.getProcess();
+                DebugExtractor extractor = new DebugExtractor(sfProxy, process);
+                DebuggerManagerThreadImpl managerThread = newSuspendContext.getDebugProcess()
+                        .getManagerThread();
+                managerThread.invokeCommand(extractor);
             }
+        }
     }
 }

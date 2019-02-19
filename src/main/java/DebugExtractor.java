@@ -5,9 +5,7 @@ import com.intellij.debugger.jdi.LocalVariablesUtil;
 import com.intellij.debugger.jdi.StackFrameProxyImpl;
 import com.intellij.openapi.util.text.StringUtil;
 import com.sun.jdi.*;
-import com.sun.tools.jdi.ArrayReferenceImpl;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,7 +29,7 @@ public class DebugExtractor implements DebuggerCommand {
             //System.out.println("current line number: " + frameProxy.location());
             // used intelliJ's LocalVariablesUtil to fetch variables in the current stackframe
             Map<DecompiledLocalVariable, Value> map = LocalVariablesUtil.fetchValues(frameProxy, debugProcess, true);
-            map.forEach(((decompiledLocalVariable, value) -> updateCache(decompiledLocalVariable, value)));
+            updateCache(map);
             System.out.println(cache);
             // for each local variable that we fetched, print out its value
             // map.forEach(((decompiledLocalVariable, value) -> printValue(decompiledLocalVariable, value)));
@@ -42,13 +40,16 @@ public class DebugExtractor implements DebuggerCommand {
         }
     }
 
-    private void updateCache(DecompiledLocalVariable var, Value val) {
-        try {
-            String varName = StringUtil.join(var.getMatchedNames(), " | ");
-            cache.put(varName, frameProxy.location().lineNumber(), val);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    private void updateCache(Map<DecompiledLocalVariable, Value> map) {
+        map.forEach(((var, val) -> {
+            try {
+                String varName = StringUtil.join(var.getMatchedNames(), " | ");
+                cache.put(varName, frameProxy.location().lineNumber(), val);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }));
+        cache.pushChangeToUI();
     }
 
     @Override

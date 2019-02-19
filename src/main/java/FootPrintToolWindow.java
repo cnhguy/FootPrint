@@ -15,6 +15,8 @@ public class FootPrintToolWindow {
 
     private DebugCache cache;
 
+    private int lastSelectedVar;
+
     private GridLayout layout;
     private JPanel content;
     private JScrollPane leftScrollPane;
@@ -25,6 +27,7 @@ public class FootPrintToolWindow {
     public static FootPrintToolWindow getInstance() {return INSTANCE;}
 
     private FootPrintToolWindow () {
+        lastSelectedVar = -1;
         initComponents();
     }
 
@@ -34,26 +37,33 @@ public class FootPrintToolWindow {
         content.setLayout(layout);
 
 
-        leftTable = new JBTable(new DefaultTableModel(new Object[]{"Variables"}, 0));
+        leftTable = new JBTable(new DefaultTableModel(new String[]{"Variables"}, 0));
         leftTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         leftTable.setRowSelectionAllowed(true);
-        leftTable.getSelectionModel().addListSelectionListener(e -> updateRightTable(leftTable.getSelectedRow()));
+        leftTable.getSelectionModel().addListSelectionListener(e -> {
+            if (leftTable.getSelectedRow() != -1) {
+                lastSelectedVar = leftTable.getSelectedRow();
+            }
+            updateRightTable();
+        });
 
         leftScrollPane = new JBScrollPane(leftTable);
         content.add(leftScrollPane);
 
-        rightTable = new JBTable(new DefaultTableModel(new Object[]{"Line","Value"}, 0));
+        rightTable = new JBTable(new DefaultTableModel(new String[]{"Line","Value"}, 0));
         rightScrollPane = new JBScrollPane(rightTable);
         content.add(rightScrollPane);
-
     }
 
     /**
-     * Set the DebugCache
+     * Set the DebugCache. Resets the tables.
      * @param cache
      */
     public void setCache(DebugCache cache) {
         this.cache = cache;
+        ((DefaultTableModel)leftTable.getModel()).setRowCount(0);
+        ((DefaultTableModel)rightTable.getModel()).setRowCount(0);
+        lastSelectedVar = -1;
     }
 
     private List<String> vars;
@@ -62,31 +72,42 @@ public class FootPrintToolWindow {
      **/
     public void cacheChanged() {
         DefaultTableModel leftTableModel = (DefaultTableModel)leftTable.getModel();
+        //set visible to false to avoid a race condition
+        leftTable.setVisible(false);
         leftTableModel.setRowCount(0);
         vars = cache.getAllVariables();
+
         for(int i = 0; i < vars.size(); i++) {
-            Object[] rowData = {vars.get(i)};
+            String[] rowData = {vars.get(i)};
             leftTableModel.addRow(rowData);
         }
+        leftTable.setVisible(true);
 
+        if (lastSelectedVar != -1) {
+            leftTable.setRowSelectionInterval(lastSelectedVar, lastSelectedVar);
+//            updateRightTable();
+        }
         //the mostRecentUpdats should reflect the updates from a specific variable, and later appened into the indexed row
     }
 
 
-    private void updateRightTable(int leftTableRow) {
-        if (leftTableRow < 0)
+    private void updateRightTable() {
+        if (lastSelectedVar == -1)
             return;
 //        System.out.println("update right table with row: " + leftTableRow);
         //link the leftTableRow to the Variable it is referring to
         DefaultTableModel rightTableModel = (DefaultTableModel)rightTable.getModel();
+        //set visible to false to avoid a race condition
+        rightTable.setVisible(false);
         rightTableModel.setRowCount(0);
-        String leftTableVariable = vars.get(leftTableRow);
+        String leftTableVariable = vars.get(lastSelectedVar);
 
         List<VariableInfo> history = cache.getHistory(leftTableVariable);
         for(int i = 0; i < history.size(); i++) {
             Object[] rowData = {history.get(i).getLine(), history.get(i).getValue()};
             rightTableModel.addRow(rowData);
         }
+        rightTable.setVisible(true);
         //Updating from getMostRecentUpdate
         //Object[] rowData = {cache.getHistory(leftTableVariable).get(i).getLine(),cache.getHistory(leftTableVariable).get(i).getValue()};
         //rightTableModel.addRow(cache.getMostRecentUpdate());

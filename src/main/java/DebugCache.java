@@ -60,19 +60,22 @@ public class DebugCache {
 
     public void put(String name, Integer line, Value value) {
         LinkedList<VariableInfo> info = vars.get(name);
-        if(info == null) {
+        if (info == null) {
             info = new LinkedList<>();
         }
         VariableInfo update = new VariableInfo(line, value);
-        if(info.size() == 0 || !update.equals(info.getLast())) {
+        if (info.size() == 0 || !update.equals(info.getLast())) {
             info.add(update);
             vars.put(name, info);
         }
+    }
+
+    public void pushChangeToUI() {
         toolWindow.cacheChanged();
     }
 
     public void clear() {
-        vars = new HashMap<String, LinkedList<VariableInfo>>();
+        vars.clear();
     }
 
     public String toString() {
