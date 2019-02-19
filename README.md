@@ -24,7 +24,7 @@ Line 4: }
 Line 5: System.out.println(sum); 
 ```
  
-The user wants to see how the variables `sum` and `i` change throughout the for loop. He or she will tell FootPrint to track `sum` and `i`. A user could proceed to any point in the program after line 5 and would still be able to look back at the histories of `sum` and `i` anytime. FootPrint records the different values that `sum` and `i` were previously assigned (along with line numbers where the change occurred) to create the following output for their histories:
+The user wants to track how the variables `sum` and `i` change throughout the for loop. He or she will tell FootPrint to track `sum` and `i` in the UI interface by typing in their names. The user then sets debugging breakpoints as normal and step through the program while FootPrint records the different values that `sum` and `i` were previously assigned (along with line numbers where the change occurred). The histories can be accessed anytime throughout the debugging process. FootPrint will create the following output for their histories:
  
 	History:
  
