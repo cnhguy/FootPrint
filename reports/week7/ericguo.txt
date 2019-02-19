@@ -1,0 +1,12 @@
+1. For next week:
+    -build a prototype to get local variables
+    -investigate using watchpoints to achieve above
+2. This week, I did not follow my plan from last week. As a team, we decided to work
+   more on getting the basic functionalities of the classes setup. I implemented the
+   basic UI in the classes FootPrintToolWindowFactory and FootPrintToolWindow with 
+   Derek. I also learned how to register tool window factories in Intellij for this.
+3. Future goals:
+    -finish the basic UI functionality:
+      -displaying arrays
+      -displaying changes in the history
+    -research new ways to get local variable states 
