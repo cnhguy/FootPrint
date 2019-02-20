@@ -84,6 +84,6 @@ Congrats! You have cloned the repository.
 
 FootPrint uses Gradle as its build system. You can trigger a build by running `./gradlew build` from the root directory.
 
-This commands will build the project and run any tests in the `/src/test/` folder.
+This command will build the project and run any tests in the `/src/test/` folder.
 
 If you wish to test FootPrint in the IDE, you can select the `Gradle` option in IntelliJ located on the far right and double click `runIde`. This will launch a separate IntelliJ window where you will see the FootPrint icon in the upper right hand corner. Here, you may test the functionality of FootPrint.
