@@ -58,6 +58,7 @@ The user wants to track how the variables `sum` and `i` change throughout the fo
 1) Set breakpoints and click the FootPrint icon, found in the upper right next to the regular IntelliJ Debugger icon. This should start a debugging session for most recently executed program
 2) Select the variables you wish to monitor from the variables window (simply right-click them and select `Add to FootPrint` or type their names in the input box of the FootPrint window).
 3) Step through your program as normal
+4) Add more variables if you wish at any time in the debugging process
 5) In a separate pane to the left of the debugger window, you should see a list of your selected variables. Clicking on a the name of one of these variables at any point in the debugging process will display their value history along with which line the value was updated from the start of the program up to whichever line you are currently at in the debugger.
 6) When you are finished, you can simply exit FootPrint by clicking the `X` in the upper right hand corner of the FootPrint pane.
 
