@@ -10,21 +10,20 @@ import java.util.*;
  */
 public class DebugCache {
 
-    private static DebugCache debugCache;
+    private static DebugCache INSTANCE;
 
-    private FootPrintToolWindow toolWindow = FootPrintToolWindow.getInstance();
     private Map<String, LinkedList<VariableInfo>> vars;
 
     private DebugCache() {
         vars = new HashMap<>();
-        toolWindow.setCache(this);
     }
 
     public static DebugCache getInstance() {
-        if (debugCache == null) {
-            debugCache = new DebugCache();
+        synchronized (DebugCache.class) {
+            if (INSTANCE == null)
+                INSTANCE = new DebugCache();
+            return INSTANCE;
         }
-        return debugCache;
     }
 
 
@@ -71,7 +70,7 @@ public class DebugCache {
     }
 
     public void pushChangeToUI() {
-        toolWindow.cacheChanged();
+        FootPrintToolWindow.getInstance().cacheChanged();
     }
 
     public void clear() {

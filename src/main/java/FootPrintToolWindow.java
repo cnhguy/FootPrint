@@ -11,11 +11,9 @@ import java.util.List;
 import javax.swing.table.DefaultTableModel;
 
 public class FootPrintToolWindow {
-    private static final FootPrintToolWindow INSTANCE = new FootPrintToolWindow();
+    private static FootPrintToolWindow INSTANCE;
 
-    private DebugCache cache;
-
-    private int lastSelectedVar;
+    private final DebugCache cache;
 
     private GridLayout layout;
     private JPanel content;
@@ -24,10 +22,16 @@ public class FootPrintToolWindow {
     private JScrollPane rightScrollPane;
     private JTable rightTable;
 
-    public static FootPrintToolWindow getInstance() {return INSTANCE;}
+    public static FootPrintToolWindow getInstance() {
+        synchronized (FootPrintToolWindow.class) {
+            if (INSTANCE == null)
+                INSTANCE = new FootPrintToolWindow();
+            return INSTANCE;
+        }
+    }
 
     private FootPrintToolWindow () {
-        lastSelectedVar = -1;
+        cache = DebugCache.getInstance();
         initComponents();
     }
 
@@ -40,12 +44,8 @@ public class FootPrintToolWindow {
         leftTable = new JBTable(new DefaultTableModel(new String[]{"Variables"}, 0));
         leftTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         leftTable.setRowSelectionAllowed(true);
-        leftTable.getSelectionModel().addListSelectionListener(e -> {
-            if (leftTable.getSelectedRow() != -1) {
-                lastSelectedVar = leftTable.getSelectedRow();
-            }
-            updateRightTable();
-        });
+        leftTable.getSelectionModel().addListSelectionListener(e -> updateRightTable(leftTable
+                .getSelectedRow()));
 
         leftScrollPane = new JBScrollPane(leftTable);
         content.add(leftScrollPane);
@@ -55,15 +55,18 @@ public class FootPrintToolWindow {
         content.add(rightScrollPane);
     }
 
-    /**
-     * Set the DebugCache. Resets the tables.
-     * @param cache
-     */
-    public void setCache(DebugCache cache) {
-        this.cache = cache;
+    public void reset() {
+        leftTable.setVisible(false);
         ((DefaultTableModel)leftTable.getModel()).setRowCount(0);
+
+        rightTable.setVisible(false);
         ((DefaultTableModel)rightTable.getModel()).setRowCount(0);
-        lastSelectedVar = -1;
+
+        leftTable.getSelectionModel().clearSelection();
+        rightTable.getSelectionModel().clearSelection();
+
+        leftTable.setVisible(true);
+        rightTable.setVisible(true);
     }
 
     private List<String> vars;
@@ -72,6 +75,7 @@ public class FootPrintToolWindow {
      **/
     public void cacheChanged() {
         DefaultTableModel leftTableModel = (DefaultTableModel)leftTable.getModel();
+        int leftTableSelection = leftTable.getSelectedRow();
         //set visible to false to avoid a race condition
         leftTable.setVisible(false);
         leftTableModel.setRowCount(0);
@@ -83,16 +87,15 @@ public class FootPrintToolWindow {
         }
         leftTable.setVisible(true);
 
-        if (lastSelectedVar != -1) {
-            leftTable.setRowSelectionInterval(lastSelectedVar, lastSelectedVar);
-//            updateRightTable();
+        if (leftTableSelection != -1) {
+            leftTable.setRowSelectionInterval(leftTableSelection, leftTableSelection);
         }
         //the mostRecentUpdats should reflect the updates from a specific variable, and later appened into the indexed row
     }
 
 
-    private void updateRightTable() {
-        if (lastSelectedVar == -1)
+    private void updateRightTable(int leftTableVarIndex) {
+        if (leftTableVarIndex == -1)
             return;
 //        System.out.println("update right table with row: " + leftTableRow);
         //link the leftTableRow to the Variable it is referring to
@@ -100,7 +103,7 @@ public class FootPrintToolWindow {
         //set visible to false to avoid a race condition
         rightTable.setVisible(false);
         rightTableModel.setRowCount(0);
-        String leftTableVariable = vars.get(lastSelectedVar);
+        String leftTableVariable = vars.get(leftTableVarIndex);
 
         List<VariableInfo> history = cache.getHistory(leftTableVariable);
         for(int i = 0; i < history.size(); i++) {

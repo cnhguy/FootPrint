@@ -26,8 +26,10 @@ public class DebugListener implements DebuggerContextListener {
     @Override
     public void changeEvent(@NotNull DebuggerContextImpl newContext, DebuggerSession.Event event) {
         System.out.println(event.toString());
+        // new debug started, clear the cache
         if (event == DebuggerSession.Event.ATTACHED) {
             DebugCache.getInstance().clear();
+            FootPrintToolWindow.getInstance().reset();
         }
         if (event == DebuggerSession.Event.PAUSE
                 || event == DebuggerSession.Event.CONTEXT
