@@ -7,7 +7,7 @@
 
 ## About:
 
-FootPrint is a user-friendly, lightweight, and simple plugin for IntelliJ that allows Java developers to view the history of their variables. FootPrint is great for developers who often find themselves overstepping in the regular IntelliJ debugger. Instead of having to restart the debugging process, users can use FootPrint to view their variables’ histories and the line numbers at which values were changed. After starting FootPrint, users can simply select one or more variables to monitor via watchpoints. At any point in the debugging process, they can click to expand on a watched variable to view the previous values that it was assigned to, as well as which line these values were updated. Unlike standard watchpoints, a user can choose when to view their variables instead of being paused each time a variable updates, which can be especially inconvenient when dealing with multiple variables of interest. Furthermore, by studying their variable’s history, a developer can better understand what is going on in a program. For example, if a method has unexpected side effects on other variables of interest, FootPrint would allow a user to easily see that.
+FootPrint is a user-friendly, lightweight, and simple plugin for IntelliJ that allows Java developers to view the history of their variables. FootPrint is great for developers who often find themselves overstepping in the regular IntelliJ debugger. Instead of having to restart the debugging process, users can use FootPrint to view their variables’ histories and the line numbers at which values were changed. After starting FootPrint, users can simply select one or more variables to monitor. At any point in the debugging process, they can click to expand on a variable to view the previous values that it was assigned to, as well as which line these values were updated. Furthermore, by studying their variable’s history, a developer can better understand what is going on in a program. For example, if a method has unexpected side effects on other variables of interest, FootPrint would allow a user to easily see that.
 
 ## Example: 
  
@@ -24,7 +24,7 @@ Line 4: }
 Line 5: System.out.println(sum); 
 ```
  
-The user wants to track how the variables `sum` and `i` change throughout the for loop. He or she will tell FootPrint to track `sum` and `i` in the UI interface by typing in their names. The user then sets debugging breakpoints as normal and step through the program while FootPrint records the different values that `sum` and `i` were previously assigned (along with line numbers where the change occurred). The histories can be accessed anytime throughout the debugging process. FootPrint will create the following output for their histories:
+The user wants to track how the variables `sum` and `i` change throughout the for loop. The user first sets debugging breakpoints as normal and start a debugging session by clicking on the FootPrint icon. Upon hitting the first breakpoint, he or she will pick from the variables that show up on the debugging variables window (in this case, `sum` and `i`) and add them to FootPrint for tracking (see more in the instructions section). The user then step through the program while FootPrint records the different values that `sum` and `i` were previously assigned (along with line numbers where the change occurred). The histories can be accessed anytime throughout the debugging process. FootPrint will create the following output for their histories:
  
 	History:
  
@@ -55,10 +55,9 @@ The user wants to track how the variables `sum` and `i` change throughout the fo
  
 ## Instructions:
 
-1) Click the FootPrint icon, found in the upper right next to the regular Intellij Debugger icon. This should start the debugger for most recently executed program
-2) Select the variables you wish to monitor (simply right-click them in your code and select `Add to FootPrint`). FootPrint supports local variables and fields.
-3) Set any desired breakpoints as normal
-4) Run the debugger as normal
+1) Set breakpoints and click the FootPrint icon, found in the upper right next to the regular IntelliJ Debugger icon. This should start a debugging session for most recently executed program
+2) Select the variables you wish to monitor from the variables window (simply right-click them and select `Add to FootPrint` or type their names in the input box of the FootPrint window).
+3) Step through your program as normal
 5) In a separate pane to the left of the debugger window, you should see a list of your selected variables. Clicking on a the name of one of these variables at any point in the debugging process will display their value history along with which line the value was updated from the start of the program up to whichever line you are currently at in the debugger.
 6) When you are finished, you can simply exit FootPrint by clicking the `X` in the upper right hand corner of the FootPrint pane.
 
