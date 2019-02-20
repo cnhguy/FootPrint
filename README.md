@@ -69,7 +69,6 @@ Congrats! You have successfully used FootPrint.
 ## Dependencies:
 
 * [Java 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
-* [Gradle 4.0+](https://gradle.org/install/)
 
 
 ## Cloning The Repository:
@@ -83,6 +82,8 @@ Congrats! You have cloned the repository.
 
 ## Build and Test:
 
-FootPrint uses Gradle as its build system. Once you have Gradle installed on your machine, you can run `gradle build`.
+FootPrint uses Gradle as its build system. You can trigger a build by running `./gradlew build` from the root directory.
 
-These commands will build the project and run any tests in the `/src/test/` folder.
+This commands will build the project and run any tests in the `/src/test/` folder.
+
+If you wish to test FootPrint in the IDE, you can select the `Gradle` option in IntelliJ located on the far right and double click `runIde`. This will launch a separate IntelliJ window where you will see the FootPrint icon in the upper right hand corner. Here, you may test the functionality of FootPrint.
