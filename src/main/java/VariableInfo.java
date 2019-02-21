@@ -1,5 +1,12 @@
+import com.sun.jdi.Field;
+import com.sun.jdi.ReferenceType;
 import com.sun.jdi.Value;
 import com.sun.tools.jdi.ArrayReferenceImpl;
+import com.sun.tools.jdi.ObjectReferenceImpl;
+import com.sun.tools.jdi.StringReferenceImpl;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Variable info holds a value and the line number at which it was assigned.
@@ -27,16 +34,42 @@ public class VariableInfo {
                 int length = valueAsArray.length();
                 valueAsString = "[";
                 for (int i = 0; i < length - 1; i++) {
-                    valueAsString += valueAsArray.getValue(i) + ", ";
+                    Value val = valueAsArray.getValue(i);
+                    valueAsString += valueAsString(val) + ", ";
                 }
                 // append the last element without the comma
                 if (length > 0) {
                     valueAsString += valueAsArray.getValue(length - 1);
                 }
                 valueAsString += "]";
+            } if (isObjectReference(value)) {
+                ObjectReferenceImpl valueAsObject = (ObjectReferenceImpl) value;
+                ReferenceType referenceType = valueAsObject.referenceType();
+
+                List<Field> fieldList = referenceType.visibleFields();
+                Map<Field, Value> fieldMap = valueAsObject.getValues(fieldList);
+
+                for (Map.Entry<Field, Value> entry : fieldMap.entrySet()) {
+                    Field field = entry.getKey();
+                    Value val = entry.getValue();
+                    valueAsString += "\n" + field.name() + ": " + valueAsString(val);
+                }
             }
         }
         return valueAsString;
+    }
+
+    /**
+     * Checks if this value reference an object (not including Strings)
+     * @param value the value
+     * @return true if this value references an object; false otherwise
+     */
+    public static boolean isObjectReference(Value value) {
+        if (value instanceof ObjectReferenceImpl && !(value instanceof StringReferenceImpl)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
