@@ -1,7 +1,5 @@
-import com.sun.tools.jdi.BooleanValueImpl;
 import org.junit.Before;
 import org.junit.Test;
-import com.sun.jdi.Value;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -11,8 +9,7 @@ public class VariableInfoTest {
 
     @Before
     public void setUp() {
-        Value val = new TestValue("v");
-        info = new VariableInfo(0, val);
+        info = new VariableInfo(0, "v");
     }
 
     @Test
@@ -28,17 +25,15 @@ public class VariableInfoTest {
 
     @Test
     public void testEquals() {
-        Value val2 = new TestValue("v");
-        VariableInfo info2 = new VariableInfo(0, val2);
+
+        VariableInfo info2 = new VariableInfo(0, "v");
         assertEquals(info, info2);
 
-        Value val3 = new TestValue("v");
-        VariableInfo info3 = new VariableInfo(1, val3);
+        VariableInfo info3 = new VariableInfo(1, "v");
         assertEquals(info, info3);
         assertEquals(info2, info3);
 
-        Value val4 = new TestValue("v4");
-        VariableInfo info4 = new VariableInfo(0, val4);
+        VariableInfo info4 = new VariableInfo(0, "v4");
         assertNotEquals(info, info4);
         assertNotEquals(info2, info4);
         assertNotEquals(info3, info4);
