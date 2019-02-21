@@ -34,6 +34,11 @@ public class DebugListener implements DebuggerContextListener, DebugProcessListe
     private VirtualMachineProxyImpl vmp;
     private String[] excludes;
 
+    /**
+     * Creates a DebugListener
+     * @param debuggerSession
+     * @param excludes
+     */
     public DebugListener(DebuggerSession debuggerSession, String[] excludes) {
         this.debuggerSession = debuggerSession;
         this.excludes = excludes;
@@ -70,6 +75,10 @@ public class DebugListener implements DebuggerContextListener, DebugProcessListe
         }
     }
 
+    /**
+     * Creates a class prepare request and registers it with the virtual machine.
+     * @param vmp
+     */
     private void setClassPrepareRequest(VirtualMachineProxyImpl vmp) {
         EventRequestManager mgr = vmp.eventRequestManager();
 
@@ -84,6 +93,11 @@ public class DebugListener implements DebuggerContextListener, DebugProcessListe
                 (this, cpr);
     }
 
+    /**
+     * Callback for thread started events. Registers class prepare requests with the virtual machine.
+     * @param proc
+     * @param thread
+     */
     @Override
     public void threadStarted(@NotNull DebugProcess proc, ThreadReference thread) {
         proc.getManagerThread().invokeCommand(new DebuggerCommand() {
@@ -110,6 +124,11 @@ public class DebugListener implements DebuggerContextListener, DebugProcessListe
         });
     }
 
+    /**
+     * Callback for ClassPrepare events. Registers ModificationWatchPoint requests for all fields in the class.
+     * @param debuggerProcess
+     * @param referenceType
+     */
     @Override
     public void processClassPrepare(DebugProcess debuggerProcess, ReferenceType referenceType) {
         System.out.println("process ClassPrepare");
@@ -127,6 +146,14 @@ public class DebugListener implements DebuggerContextListener, DebugProcessListe
         }
     }
 
+    /**
+     * Callback for Locatable events. If they are ModificationWatchPoint events, then creates an extractor to get the
+     * field's value.
+     * @param action
+     * @param event
+     * @return
+     * @throws EventProcessingException
+     */
     @Override
     public boolean processLocatableEvent(SuspendContextCommandImpl action, LocatableEvent event) throws EventProcessingException {
         System.out.println("process LocatableEvent");
@@ -137,6 +164,10 @@ public class DebugListener implements DebuggerContextListener, DebugProcessListe
         return true;
     }
 
+    /**
+     * Returns the suspend policy SUSPEND_NONE
+     * @return
+     */
     @Override
     public String getSuspendPolicy() {
         return "SUSPEND_NONE";

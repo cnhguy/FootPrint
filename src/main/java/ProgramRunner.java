@@ -23,7 +23,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintWriter;
 
-
+/**
+ * Custom ProgramRunner in conjunction with FootPrint_Executor. Registers listeners in the VM for certain events.
+ */
 public class ProgramRunner extends GenericDebuggerRunner {
 
     public ProgramRunner() {
@@ -40,6 +42,12 @@ public class ProgramRunner extends GenericDebuggerRunner {
         return RUNNER_ID;
     }
 
+    /**
+     * Returns true iff the executor is the FootPrint_Executor
+     * @param executorId
+     * @param profile
+     * @return
+     */
     @Override
     public boolean canRun(@NotNull String executorId, @NotNull RunProfile profile) {
         boolean r =  executorId.equals(FootPrint_Executor.EXECUTOR_ID) && profile instanceof ModuleRunProfile
@@ -47,6 +55,15 @@ public class ProgramRunner extends GenericDebuggerRunner {
         return r;
     }
 
+    /**
+     * Registers the listeners, among other Intellij actions.
+     * @param state
+     * @param env
+     * @param connection
+     * @param pollTimeout
+     * @return
+     * @throws ExecutionException
+     */
     @Nullable
     @Override
     protected RunContentDescriptor attachVirtualMachine(RunProfileState state,
