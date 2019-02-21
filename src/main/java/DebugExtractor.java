@@ -7,6 +7,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.sun.jdi.*;
 import com.sun.tools.jdi.ArrayReferenceImpl;
 import com.sun.tools.jdi.StringReferenceImpl;
+import com.sun.jdi.event.ModificationWatchpointEvent;
 
 import java.util.Collections;
 import java.util.List;
@@ -20,6 +21,10 @@ public class DebugExtractor implements DebuggerCommand {
     private StackFrameProxyImpl frameProxy;
     private DebugProcess debugProcess;
     private DebugCache cache;
+
+    public DebugExtractor() {
+        this(null, null);
+    }
 
     public DebugExtractor(StackFrameProxyImpl frameProxy, DebugProcess debugProcess) {
         this.frameProxy = frameProxy;
@@ -42,6 +47,14 @@ public class DebugExtractor implements DebuggerCommand {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void fieldUpdate(ModificationWatchpointEvent e) {
+        System.out.println("process ModificationWatchpointEvent");
+        Field field = e.field();
+        Value value = e.valueToBe();
+        cache.put(field.name(), e.location().lineNumber(), value);
+        cache.pushChangeToUI();
     }
 
     private String valueAsString(Value value) {
