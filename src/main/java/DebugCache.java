@@ -10,7 +10,7 @@ import java.util.*;
  */
 public class DebugCache {
 
-    private static DebugCache debugCache;
+    private static DebugCache INSTANCE;
 
     private Map<String, LinkedList<VariableInfo>> vars;
 
@@ -19,10 +19,11 @@ public class DebugCache {
     }
 
     public static DebugCache getInstance() {
-        if (debugCache == null) {
-            debugCache = new DebugCache();
+        synchronized (DebugCache.class) {
+            if (INSTANCE == null)
+                INSTANCE = new DebugCache();
+            return INSTANCE;
         }
-        return debugCache;
     }
 
 
@@ -32,7 +33,7 @@ public class DebugCache {
      * @return the history of the variable's values
      */
     public List<VariableInfo> getHistory(String var) {
-        return vars.get(var);
+        return (List<VariableInfo>) vars.get(var).clone();
     }
 
     /**
@@ -58,18 +59,22 @@ public class DebugCache {
 
     public void put(String name, Integer line, Value value) {
         LinkedList<VariableInfo> info = vars.get(name);
-        if(info == null) {
+        if (info == null) {
             info = new LinkedList<>();
         }
         VariableInfo update = new VariableInfo(line, value);
-        if(info.size() == 0 || !update.equals(info.getLast())) {
+        if (info.size() == 0 || !update.equals(info.getLast())) {
             info.add(update);
             vars.put(name, info);
         }
     }
 
+    public void pushChangeToUI() {
+        FootPrintToolWindow.getInstance().cacheChanged();
+    }
+
     public void clear() {
-        vars = new HashMap<String, LinkedList<VariableInfo>>();
+        vars.clear();
     }
 
     public String toString() {
