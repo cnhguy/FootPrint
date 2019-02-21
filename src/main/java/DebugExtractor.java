@@ -23,16 +23,27 @@ public class DebugExtractor implements DebuggerCommand {
     private DebugProcess debugProcess;
     private DebugCache cache;
 
+    /**
+     * Initializes with null frame proxy, null debug process, and the cache
+     */
     public DebugExtractor() {
         this(null, null);
     }
 
+    /**
+     * Creates a DebugExtractor
+     * @param frameProxy
+     * @param debugProcess
+     */
     public DebugExtractor(StackFrameProxyImpl frameProxy, DebugProcess debugProcess) {
         this.frameProxy = frameProxy;
         this.debugProcess = debugProcess;
         this.cache = DebugCache.getInstance();
     }
 
+    /**
+     * Callback for a DebuggerCommand. Gets all visible local variables and sends them to the cache.
+     */
     @Override
     public void action() {
         try {
@@ -50,6 +61,10 @@ public class DebugExtractor implements DebuggerCommand {
         }
     }
 
+    /**
+     * Used for ModificationWatchPointEvents. Gets the field name, value, and line number and sends to the cache.
+     * @param e
+     */
     public void fieldUpdate(ModificationWatchpointEvent e) {
         System.out.println("process ModificationWatchpointEvent");
         Field field = e.field();
@@ -93,6 +108,10 @@ public class DebugExtractor implements DebuggerCommand {
         return valueAsString;
     }
 
+    /**
+     * Helper method to easily send local varaibles to the cache.
+     * @param map
+     */
     private void updateCache(Map<DecompiledLocalVariable, Value> map) {
         map.forEach(((var, val) -> {
             try {
@@ -105,6 +124,9 @@ public class DebugExtractor implements DebuggerCommand {
         cache.pushChangeToUI();
     }
 
+    /**
+     * Callback for DebuggerCommand
+     */
     @Override
     public void commandCancelled() {
 

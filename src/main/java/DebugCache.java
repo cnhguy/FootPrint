@@ -67,10 +67,16 @@ public class DebugCache {
         }
     }
 
+    /**
+     * Notify the UI of changes to the cache.
+     */
     public void pushChangeToUI() {
         FootPrintToolWindow.getInstance().cacheChanged();
     }
 
+    /**
+     * Clears the cache
+     */
     public void clear() {
         vars.clear();
     }
