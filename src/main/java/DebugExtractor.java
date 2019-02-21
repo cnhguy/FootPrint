@@ -5,6 +5,7 @@ import com.intellij.debugger.jdi.LocalVariablesUtil;
 import com.intellij.debugger.jdi.StackFrameProxyImpl;
 import com.intellij.openapi.util.text.StringUtil;
 import com.sun.jdi.*;
+
 import com.sun.tools.jdi.ArrayReferenceImpl;
 import com.sun.tools.jdi.StringReferenceImpl;
 import com.sun.jdi.event.ModificationWatchpointEvent;
@@ -53,7 +54,7 @@ public class DebugExtractor implements DebuggerCommand {
         System.out.println("process ModificationWatchpointEvent");
         Field field = e.field();
         Value value = e.valueToBe();
-        cache.put(field.name(), e.location().lineNumber(), value);
+        cache.put(field.name(), e.location().lineNumber(), valueAsString(value));
         cache.pushChangeToUI();
     }
 
