@@ -10,7 +10,7 @@
 	- Setup Travis CI
 	- Wrote unit tests for VariableInfo class
 	- Access and print fields of objects
-	- Started on UI implementation
+	- Started on UI implementation. Got a basic FootPrint window that displays variables and their histories
 
 3. Next week’s plan:
  	- Decide on how we want to represent the variable's histories
