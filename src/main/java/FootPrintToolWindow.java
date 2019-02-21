@@ -10,6 +10,9 @@ import java.lang.Object.*;
 import java.util.List;
 import javax.swing.table.DefaultTableModel;
 
+/**
+ * Manages the ToolWindow's content, i.e. what is displayed in the tool window.
+ */
 public class FootPrintToolWindow {
     private static FootPrintToolWindow INSTANCE;
 
@@ -22,6 +25,10 @@ public class FootPrintToolWindow {
     private JScrollPane rightScrollPane;
     private JTable rightTable;
 
+    /**
+     * Returns an instance of this
+     * @return
+     */
     public static FootPrintToolWindow getInstance() {
         synchronized (FootPrintToolWindow.class) {
             if (INSTANCE == null)
@@ -55,6 +62,9 @@ public class FootPrintToolWindow {
         content.add(rightScrollPane);
     }
 
+    /**
+     * Reset the content to the intial state.
+     */
     public void reset() {
         leftTable.setVisible(false);
         ((DefaultTableModel)leftTable.getModel()).setRowCount(0);
@@ -71,7 +81,7 @@ public class FootPrintToolWindow {
 
     private List<String> vars;
     /**
-     * The set DebugCache should calls this method to notify this class of a change in the cache and to update accordingly
+     * The set DebugCache should call this method to notify this class of a change in the cache and to update accordingly
      **/
     public void cacheChanged() {
         DefaultTableModel leftTableModel = (DefaultTableModel)leftTable.getModel();
@@ -117,6 +127,10 @@ public class FootPrintToolWindow {
 
     }
 
+    /**
+     * returns the content to be displayed by the ToolWindow
+     * @return
+     */
    public JPanel getContent() {
         return content;
    }

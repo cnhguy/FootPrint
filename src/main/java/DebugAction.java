@@ -6,12 +6,22 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Class called when a user clicks on the FootPrint Debug icon to initiate FootPrint during debugging.
+ */
 public class DebugAction extends AnAction{
 
+    /**
+     * Creates a DebugAction
+     */
     public DebugAction() {
         super("","start FootPrint", AllIcons.General.IjLogo);
     }
 
+    /**
+     * Callback for button clicked. Initiates the debugging with FootPrint.
+     * @param e
+     */
     @Override
     public void actionPerformed(AnActionEvent e) {
         RunnerAndConfigurationSettings config = RunManagerImpl.getInstanceEx(e.getProject())
@@ -19,26 +29,8 @@ public class DebugAction extends AnAction{
         if (config != null) {
             System.out.println(config.getName()); // prints out the method's name
 
-            this.executeConfiguration(config, FootPrint_Executor.getMyExecutorInstance());
+            ProgramRunnerUtil.executeConfiguration(config, FootPrint_Executor.getMyExecutorInstance());
         }
-    }
-
-    private static void executeConfiguration(@NotNull RunnerAndConfigurationSettings configuration,
-                                             @NotNull Executor executor) {
-        ExecutionEnvironmentBuilder builder;
-        try {
-            builder = ExecutionEnvironmentBuilder.create(executor, configuration);
-            builder.runner(new ProgramRunner());
-        }
-        catch (ExecutionException e) {
-            e.printStackTrace();
-            return;
-        }
-        ProgramRunnerUtil.executeConfiguration(builder
-                .contentToReuse(null)
-                .dataContext(null)
-                .activeTarget()
-                .build(), true, true);
     }
 
 }

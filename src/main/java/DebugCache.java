@@ -57,6 +57,12 @@ public class DebugCache {
         return null;
     }
 
+    /**
+     * Adds the given information to the cache.
+     * @param name
+     * @param line
+     * @param value
+     */
     public void put(String name, Integer line, Value value) {
         LinkedList<VariableInfo> info = vars.get(name);
         if (info == null) {
@@ -69,10 +75,16 @@ public class DebugCache {
         }
     }
 
+    /**
+     * Notify the UI of changes to the cache.
+     */
     public void pushChangeToUI() {
         FootPrintToolWindow.getInstance().cacheChanged();
     }
 
+    /**
+     * Clears the cache
+     */
     public void clear() {
         vars.clear();
     }
