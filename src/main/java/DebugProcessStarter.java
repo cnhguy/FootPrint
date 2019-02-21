@@ -9,6 +9,9 @@ import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.impl.XDebugSessionImpl;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Custom process starter.
+ */
 public class DebugProcessStarter extends XDebugProcessStarter {
 
     private DebugProcessImpl debugProcess;
