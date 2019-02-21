@@ -1,0 +1,25 @@
+
+1. Previous week’s plan: 
+ 	- Finish the build process of v1.0 Runner, Listener, and Extractor.
+ 	- Eric + Derek on Extractor, Hang + Audrey on Runner and Listener
+ 	- Try record states of local variables.
+
+2. This week’s progress:
+	- Completed last week's goal. Have v1.0 of runner, listener, extractor, cache
+	- Gained access to all variables in the stack frame and were able to print their contents
+	- Setup Travis CI
+	- Wrote unit tests for VariableInfo class
+	- Access and print fields of objects
+	- Started on UI implementation. Got a basic FootPrint window that displays variables and their histories
+
+3. Next week’s plan:
+ 	- Decide on how we want to represent the variable's histories
+ 	- Document methods and classes
+ 	- Implement UI to display objects and primitives
+ 	- Implement a way for users to specify what variables they want to track
+
+4. Meeting agenda:
+   1. Discuss possible ways to display histories and objects
+   2. How to write integration testing for plugins
+   3. Discuss only collecting data when the debugger is suspsend (i.e FootPrint
+      tracks variable histories as the user is debugging)
