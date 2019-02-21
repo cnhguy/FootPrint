@@ -5,8 +5,11 @@ import com.intellij.debugger.jdi.LocalVariablesUtil;
 import com.intellij.debugger.jdi.StackFrameProxyImpl;
 import com.intellij.openapi.util.text.StringUtil;
 import com.sun.jdi.*;
+
 import com.sun.tools.jdi.ArrayReferenceImpl;
 import com.sun.tools.jdi.StringReferenceImpl;
+import com.sun.jdi.event.ModificationWatchpointEvent;
+
 
 import java.util.Collections;
 import java.util.List;
@@ -20,6 +23,10 @@ public class DebugExtractor implements DebuggerCommand {
     private StackFrameProxyImpl frameProxy;
     private DebugProcess debugProcess;
     private DebugCache cache;
+
+    public DebugExtractor() {
+        this(null, null);
+    }
 
     public DebugExtractor(StackFrameProxyImpl frameProxy, DebugProcess debugProcess) {
         this.frameProxy = frameProxy;
@@ -43,6 +50,7 @@ public class DebugExtractor implements DebuggerCommand {
             e.printStackTrace();
         }
     }
+
 
     private String valueAsString(Value value) {
         String valueAsString = null;
@@ -77,6 +85,14 @@ public class DebugExtractor implements DebuggerCommand {
             }
         }
         return valueAsString;
+
+    public void fieldUpdate(ModificationWatchpointEvent e) {
+        System.out.println("process ModificationWatchpointEvent");
+        Field field = e.field();
+        Value value = e.valueToBe();
+        cache.put(field.name(), e.location().lineNumber(), value);
+        cache.pushChangeToUI();
+
     }
 
     private void updateCache(Map<DecompiledLocalVariable, Value> map) {

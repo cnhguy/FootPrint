@@ -2,15 +2,26 @@ import com.intellij.debugger.DebugEnvironment;
 import com.intellij.debugger.DebuggerManagerEx;
 import com.intellij.debugger.DefaultDebugEnvironment;
 import com.intellij.debugger.engine.*;
+import com.intellij.debugger.engine.managerThread.DebuggerCommand;
+import com.intellij.debugger.engine.requests.RequestManagerImpl;
 import com.intellij.debugger.impl.DebuggerSession;
 import com.intellij.debugger.impl.GenericDebuggerRunner;
+import com.intellij.debugger.jdi.VirtualMachineProxyImpl;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.*;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.ui.RunContentDescriptor;
 import com.intellij.xdebugger.XDebuggerManager;
+import com.sun.jdi.StackFrame;
+import com.sun.jdi.ThreadReference;
+import com.sun.jdi.VirtualMachine;
+import com.sun.jdi.request.ClassPrepareRequest;
+import com.sun.jdi.request.EventRequest;
+import com.sun.jdi.request.EventRequestManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.io.PrintWriter;
 
 
 public class ProgramRunner extends GenericDebuggerRunner {
@@ -20,6 +31,8 @@ public class ProgramRunner extends GenericDebuggerRunner {
     }
 
     public static final String RUNNER_ID = "MyDebugRunner";
+
+    private String[] excludes = {"java.*", "javax.*", "sun.*", "com.sun.*"};
 
     @Override
     @NotNull
@@ -47,15 +60,18 @@ public class ProgramRunner extends GenericDebuggerRunner {
             return null;
         }
 
-        DebugListener debugListener = new DebugListener(debuggerSession);
-
+        DebugListener debugListener = new DebugListener(debuggerSession, excludes);
         debuggerSession.getContextManager().addListener(debugListener);
 
         final DebugProcessImpl debugProcess = debuggerSession.getProcess();
+        debugProcess.addDebugProcessListener(debugListener);
+
         DebugProcessStarter debugProcessStarter = new DebugProcessStarter(debugProcess, debuggerSession);
 
         return XDebuggerManager.getInstance(env.getProject())
                 .startSession(env, debugProcessStarter)
                 .getRunContentDescriptor();
     }
+
+
 }
