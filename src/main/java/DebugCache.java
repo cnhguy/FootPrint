@@ -1,5 +1,3 @@
-import com.sun.jdi.Value;
-
 import java.util.*;
 
 /**
@@ -57,7 +55,7 @@ public class DebugCache {
         return null;
     }
 
-    public void put(String name, Integer line, Value value) {
+    public void put(String name, Integer line, String value) {
         LinkedList<VariableInfo> info = vars.get(name);
         if (info == null) {
             info = new LinkedList<>();

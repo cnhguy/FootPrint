@@ -5,7 +5,11 @@ import com.intellij.debugger.jdi.LocalVariablesUtil;
 import com.intellij.debugger.jdi.StackFrameProxyImpl;
 import com.intellij.openapi.util.text.StringUtil;
 import com.sun.jdi.*;
+import com.sun.tools.jdi.ArrayReferenceImpl;
+import com.sun.tools.jdi.StringReferenceImpl;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -40,11 +44,46 @@ public class DebugExtractor implements DebuggerCommand {
         }
     }
 
+    private String valueAsString(Value value) {
+        String valueAsString = null;
+        if (value != null) {
+            valueAsString = value.toString();
+            // If the value is an array, print it out in array format --> [x, y, z]
+            if (value instanceof ArrayReferenceImpl) {
+                ArrayReferenceImpl valueAsArray = (ArrayReferenceImpl) value;
+                int length = valueAsArray.length();
+                valueAsString = "[";
+                for (int i = 0; i < length - 1; i++) {
+                    Value val = valueAsArray.getValue(i);
+                    valueAsString += valueAsString(val) + ", ";
+                }
+                // append the last element without the comma
+                if (length > 0) {
+                    valueAsString += valueAsArray.getValue(length - 1);
+                }
+                valueAsString += "]";
+            } else if (value instanceof ObjectReference && !(value instanceof StringReferenceImpl)) {
+                // if value is an object that is not a string, call the objects toString()
+                ObjectReference or = (ObjectReference) value;
+                ReferenceType ref = or.referenceType();
+                List<Method> methods = ref.methodsByName("toString");
+                try {
+                    Value toString = or.invokeMethod(frameProxy.threadProxy().getThreadReference(),
+                            methods.get(0), Collections.EMPTY_LIST, ObjectReference.INVOKE_SINGLE_THREADED);
+                    valueAsString = toString.toString();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return valueAsString;
+    }
+
     private void updateCache(Map<DecompiledLocalVariable, Value> map) {
         map.forEach(((var, val) -> {
             try {
                 String varName = StringUtil.join(var.getMatchedNames(), " | ");
-                cache.put(varName, frameProxy.location().lineNumber(), val);
+                cache.put(varName, frameProxy.location().lineNumber(), valueAsString(val));
             } catch (Exception e) {
                 e.printStackTrace();
             }
