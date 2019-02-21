@@ -16,6 +16,11 @@
     <extensions defaultExtensionNs="com.intellij">
         <programRunner implementation="ProgramRunner"/>
         <executor implementation="FootPrint_Executor"/>
+        <toolWindow id="FootPrint"
+                    anchor="left"
+                    secondary="true"
+                    icon="AllIcons.General.IjLogo"
+                    factoryClass="FootPrintToolWindowFactory" />
     </extensions>
 
     <actions>
