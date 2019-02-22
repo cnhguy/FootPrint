@@ -10,7 +10,7 @@ import com.intellij.xdebugger.impl.XDebugSessionImpl;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Custom process starter.
+ * Custom debug process starter.
  */
 public class DebugProcessStarter extends XDebugProcessStarter {
 
@@ -24,8 +24,8 @@ public class DebugProcessStarter extends XDebugProcessStarter {
 
     /**
      * Returns a Java debugger process
-     * @param session
-     * @return
+     * @param session the current debugging session
+     * @return Java debugger process
      */
     @Override
     @NotNull

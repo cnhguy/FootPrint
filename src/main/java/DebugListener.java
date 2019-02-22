@@ -46,8 +46,8 @@ public class DebugListener implements DebuggerContextListener, DebugProcessListe
 
     /**
      * If the debugger is paused, tells the manager thread to run the extractor
-     * @param newContext
-     * @param event
+     * @param newContext context (holds stackframe proxy, threads, debug session)
+     * @param event debugger event
      */
     @Override
     public void changeEvent(@NotNull DebuggerContextImpl newContext, DebuggerSession.Event event) {
@@ -77,7 +77,7 @@ public class DebugListener implements DebuggerContextListener, DebugProcessListe
 
     /**
      * Creates a class prepare request and registers it with the virtual machine.
-     * @param vmp
+     * @param vmp the virtual machine
      */
     private void setClassPrepareRequest(VirtualMachineProxyImpl vmp) {
         EventRequestManager mgr = vmp.eventRequestManager();
@@ -95,7 +95,7 @@ public class DebugListener implements DebuggerContextListener, DebugProcessListe
 
     /**
      * Callback for thread started events. Registers class prepare requests with the virtual machine.
-     * @param proc
+     * @param proc debug process
      * @param thread
      */
     @Override
@@ -126,8 +126,8 @@ public class DebugListener implements DebuggerContextListener, DebugProcessListe
 
     /**
      * Callback for ClassPrepare events. Registers ModificationWatchPoint requests for all fields in the class.
-     * @param debuggerProcess
-     * @param referenceType
+     * @param debuggerProcess debugger process
+     * @param referenceType reference type to this object
      */
     @Override
     public void processClassPrepare(DebugProcess debuggerProcess, ReferenceType referenceType) {
@@ -138,7 +138,7 @@ public class DebugListener implements DebuggerContextListener, DebugProcessListe
             ModificationWatchpointRequest req =
                     ((RequestManagerImpl)vmp.getDebugProcess().getRequestsManager())
                             .createModificationWatchpointRequest(this, field);
-            for (int i=0; i<excludes.length; ++i) {
+            for (int i = 0; i < excludes.length; ++i) {
                 req.addClassExclusionFilter(excludes[i]);
             }
             req.setSuspendPolicy(EventRequest.SUSPEND_NONE);
@@ -152,10 +152,9 @@ public class DebugListener implements DebuggerContextListener, DebugProcessListe
      * @param action
      * @param event
      * @return
-     * @throws EventProcessingException
      */
     @Override
-    public boolean processLocatableEvent(SuspendContextCommandImpl action, LocatableEvent event) throws EventProcessingException {
+    public boolean processLocatableEvent(SuspendContextCommandImpl action, LocatableEvent event) {
         System.out.println("process LocatableEvent");
         if (event instanceof ModificationWatchpointEvent) {
             DebugExtractor extractor = new DebugExtractor();

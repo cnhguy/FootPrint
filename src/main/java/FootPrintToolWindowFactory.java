@@ -22,7 +22,7 @@ public class FootPrintToolWindowFactory implements ToolWindowFactory {
     /**
      * The ToolWindow should be available to all projects
      * @param project
-     * @return
+     * @return true for all projects
      */
     @Override
     public boolean shouldBeAvailable(@NotNull Project project) {
@@ -31,7 +31,7 @@ public class FootPrintToolWindowFactory implements ToolWindowFactory {
 
     /**
      * The tool window is not created on start
-     * @return
+     * @return false -- not created on start
      */
     @Override
     public boolean isDoNotActivateOnStart() {

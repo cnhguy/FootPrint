@@ -10,14 +10,25 @@ import java.util.*;
  */
 public class DebugCache {
 
+    /**
+     * Singleton instance of DebugCache
+     */
     private static DebugCache INSTANCE;
 
+    /**
+     * Maps a variable to its previously assigned values
+     */
     private Map<String, LinkedList<VariableInfo>> vars;
+
 
     private DebugCache() {
         vars = new HashMap<>();
     }
 
+    /**
+     * Returns an instance of the cache
+     * @return cache instance
+     */
     public static DebugCache getInstance() {
         synchronized (DebugCache.class) {
             if (INSTANCE == null)
@@ -59,9 +70,9 @@ public class DebugCache {
 
     /**
      * Adds the given information to the cache.
-     * @param name
-     * @param line
-     * @param value
+     * @param name variable name
+     * @param line line number where the variable took on its new value
+     * @param value variable's value
      */
     public void put(String name, Integer line, Value value) {
         LinkedList<VariableInfo> info = vars.get(name);

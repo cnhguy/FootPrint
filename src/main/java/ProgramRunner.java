@@ -44,7 +44,7 @@ public class ProgramRunner extends GenericDebuggerRunner {
 
     /**
      * Returns true iff the executor is the FootPrint_Executor
-     * @param executorId
+     * @param executorId executor's id
      * @param profile
      * @return
      */

@@ -80,6 +80,7 @@ public class FootPrintToolWindow {
     }
 
     private List<String> vars;
+
     /**
      * The set DebugCache should call this method to notify this class of a change in the cache and to update accordingly
      **/

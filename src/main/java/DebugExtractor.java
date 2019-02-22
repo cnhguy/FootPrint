@@ -27,8 +27,8 @@ public class DebugExtractor implements DebuggerCommand {
 
     /**
      * Creates a DebugExtractor
-     * @param frameProxy
-     * @param debugProcess
+     * @param frameProxy Access to the current stackframe
+     * @param debugProcess Current debugger process
      */
     public DebugExtractor(StackFrameProxyImpl frameProxy, DebugProcess debugProcess) {
         this.frameProxy = frameProxy;
@@ -69,8 +69,8 @@ public class DebugExtractor implements DebuggerCommand {
     }
 
     /**
-     * Helper method to easily send local varaibles to the cache.
-     * @param map
+     * Helper method to easily send local variables to the cache.
+     * @param map local variables
      */
     private void updateCache(Map<DecompiledLocalVariable, Value> map) {
         map.forEach(((var, val) -> {
