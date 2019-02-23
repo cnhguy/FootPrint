@@ -1,4 +1,5 @@
 import com.sun.jdi.Field;
+import com.sun.jdi.ObjectReference;
 import com.sun.jdi.ReferenceType;
 import com.sun.jdi.Value;
 import com.sun.tools.jdi.ArrayReferenceImpl;
@@ -15,61 +16,17 @@ public class VariableInfo {
     private int line;
     private String value;
 
-    public VariableInfo(int line, Value value) {
+    public VariableInfo(int line, String value) {
         this.line = line;
-        this.value = valueAsString(value);
-    }
-
-    public String toString() {
-        return "line: " + line + ", value: " + value;
-    }
-
-    private String valueAsString(Value value) {
-        String valueAsString = null;
-        if (value != null) {
-            valueAsString = value.toString();
-            // If the value is an array, print it out in array format --> [x, y, z]
-            if (value instanceof ArrayReferenceImpl) {
-                ArrayReferenceImpl valueAsArray = (ArrayReferenceImpl) value;
-                int length = valueAsArray.length();
-                valueAsString = "[";
-                for (int i = 0; i < length - 1; i++) {
-                    Value val = valueAsArray.getValue(i);
-                    valueAsString += valueAsString(val) + ", ";
-                }
-                // append the last element without the comma
-                if (length > 0) {
-                    valueAsString += valueAsArray.getValue(length - 1);
-                }
-                valueAsString += "]";
-            } if (isObjectReference(value)) {
-                ObjectReferenceImpl valueAsObject = (ObjectReferenceImpl) value;
-                ReferenceType referenceType = valueAsObject.referenceType();
-
-                List<Field> fieldList = referenceType.visibleFields();
-                Map<Field, Value> fieldMap = valueAsObject.getValues(fieldList);
-
-                for (Map.Entry<Field, Value> entry : fieldMap.entrySet()) {
-                    Field field = entry.getKey();
-                    Value val = entry.getValue();
-                    valueAsString += "\n" + field.name() + ": " + valueAsString(val);
-                }
-            }
-        }
-        return valueAsString;
+        this.value = value;
     }
 
     /**
-     * Checks if this value reference an object (not including Strings)
-     * @param value the value
-     * @return true if this value references an object; false otherwise
+     * Returns the line and value pair in string format
+     * @return line value pair as string
      */
-    public static boolean isObjectReference(Value value) {
-        if (value instanceof ObjectReferenceImpl && !(value instanceof StringReferenceImpl)) {
-            return true;
-        } else {
-            return false;
-        }
+    public String toString() {
+        return "line: " + line + ", value: " + value;
     }
 
     /**
