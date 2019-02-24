@@ -17,10 +17,7 @@ import com.intellij.ui.classFilter.ClassFilter;
 import com.sun.jdi.*;
 import com.sun.jdi.event.LocatableEvent;
 import com.sun.jdi.event.ModificationWatchpointEvent;
-import com.sun.jdi.request.ClassPrepareRequest;
-import com.sun.jdi.request.EventRequest;
-import com.sun.jdi.request.EventRequestManager;
-import com.sun.jdi.request.ModificationWatchpointRequest;
+import com.sun.jdi.request.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -132,11 +129,28 @@ public class DebugListener implements DebuggerContextListener, DebugProcessListe
     @Override
     public void processClassPrepare(DebugProcess debuggerProcess, ReferenceType referenceType) {
         System.out.println("process ClassPrepare");
+        registerModificationWatchPointRequests(debuggerProcess, referenceType);
+    }
+
+    private void registerBreakPointRequests(DebugProcess debuggerProcess, ReferenceType referenceType) {
+        List<Location> executableLines;
+        try {
+            executableLines = referenceType.allLineLocations();
+        } catch (AbsentInformationException exc) {
+            exc.printStackTrace();
+            return;
+        }
+        for (Location loc : executableLines) {
+            BreakpointRequest breakpointRequest;
+        }
+    }
+
+    private void registerModificationWatchPointRequests(DebugProcess debuggerProcess, ReferenceType referenceType) {
         List<Field> fields = referenceType.visibleFields();
         for (Field field : fields) {
             System.out.println(field);
             ModificationWatchpointRequest req =
-                    ((RequestManagerImpl)vmp.getDebugProcess().getRequestsManager())
+                    ((RequestManagerImpl)debuggerProcess.getRequestsManager())
                             .createModificationWatchpointRequest(this, field);
             for (int i=0; i<excludes.length; ++i) {
                 req.addClassExclusionFilter(excludes[i]);
