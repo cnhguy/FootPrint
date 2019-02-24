@@ -6,8 +6,8 @@ import com.sun.jdi.LocalVariable;
 import java.util.*;
 
 /**
- * Cache that holds info about local variables on the stack. Maps the name
- * of the variable to a list of VariableInfo object that holds its previous values
+ * Cache that holds info about local variables and fields on the stack. Maps the field or variable
+ * to a list of VariableInfo object that holds its previous values
  * and the line number at which those values were assigned. Note that
  * values are only cached if they have changed.
  */
@@ -15,8 +15,14 @@ public class DebugCache {
 
     private static DebugCache INSTANCE;
 
+    /**
+     * Map of local variables on the stack
+     */
     private Map<LocalVariable, LinkedList<VariableInfo>> vars;
 
+    /**
+     * Map of fields tracked by watch points
+     */
     private Map<Field, LinkedList<VariableInfo>> fields;
 
     private DebugCache() {
@@ -24,6 +30,10 @@ public class DebugCache {
         fields = new HashMap<>();
     }
 
+    /**
+     * Returns an instance of the cache
+     * @return an instance of the cache
+     */
     public static DebugCache getInstance() {
         synchronized (DebugCache.class) {
             if (INSTANCE == null)
@@ -35,8 +45,8 @@ public class DebugCache {
 
     /**
      * Returns the history of the var
-     * @param var variable
-     * @return the history of the variable's values
+     * @param var field or local variable
+     * @return the history of var's values
      */
     public List<VariableInfo> getHistory(Object var) {
         if (var instanceof LocalVariable) {

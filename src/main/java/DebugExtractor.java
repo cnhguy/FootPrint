@@ -1,13 +1,9 @@
 import com.intellij.debugger.engine.DebugProcess;
 import com.intellij.debugger.engine.managerThread.DebuggerCommand;
-import com.intellij.debugger.jdi.DecompiledLocalVariable;
-import com.intellij.debugger.jdi.LocalVariablesUtil;
 import com.intellij.debugger.jdi.StackFrameProxyImpl;
-import com.intellij.openapi.util.text.StringUtil;
 import com.sun.jdi.*;
 
 import com.sun.tools.jdi.ArrayReferenceImpl;
-import com.sun.tools.jdi.StringReferenceImpl;
 import com.sun.jdi.event.ModificationWatchpointEvent;
 
 import java.util.Collections;
@@ -73,6 +69,11 @@ public class DebugExtractor implements DebuggerCommand {
         cache.pushChangeToUI();
     }
 
+    /**
+     * Returns value as a string
+     * @param value variable or field's value
+     * @return value as a string
+     */
     private String valueAsString(Value value) {
         String valueAsString = "null";
         if (value != null) {
