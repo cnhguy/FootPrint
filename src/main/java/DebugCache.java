@@ -21,7 +21,7 @@ public class DebugCache {
     private Map<LocalVariable, LinkedList<VariableInfo>> vars;
 
     /**
-     * Map of fields tracked by watch points
+     * Map of fields
      */
     private Map<Field, LinkedList<VariableInfo>> fields;
 
