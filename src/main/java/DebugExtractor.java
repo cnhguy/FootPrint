@@ -46,14 +46,29 @@ public class DebugExtractor implements DebuggerCommand {
         try {
             StackFrame frame = frameProxy.getStackFrame();
 
-            // Retrieve and cache all fields in "this" object/class of the frame.
-            // Works for static instances as well
-            ReferenceType referenceType = frameProxy.location().declaringType();
-            List<Field> fields = referenceType.fields();
-            for (Field field : fields) {
-                Value value = referenceType.getValue(field);
-                cache.put(field, frame.location().lineNumber(), valueAsString(value));
+            // Retrieve and cache fields of the current frame
+            ObjectReference thisObject = frame.thisObject();
+            if (thisObject != null) {
+                // if the frame is in an object
+                ReferenceType referenceType = thisObject.referenceType();
+                List<Field> fieldList = referenceType.visibleFields();
+                Map<Field, Value> fieldMap = thisObject.getValues(fieldList);
+
+                for (Map.Entry<Field, Value> entry : fieldMap.entrySet()) {
+                    Field field = entry.getKey();
+                    Value val = entry.getValue();
+                    cache.put(field, frameProxy.location().lineNumber(), valueAsString(val));
+                }
+            } else {
+                // if the frame is in a native or static method
+                ReferenceType referenceType = frameProxy.location().declaringType();
+                List<Field> fields = referenceType.fields();
+                for (Field field : fields) {
+                    Value value = referenceType.getValue(field);
+                    cache.put(field, frame.location().lineNumber(), valueAsString(value));
+                }
             }
+
 
             // Retrieve and cache all local var on the frame
             List<LocalVariable> localVariables = frame.visibleVariables();
@@ -130,7 +145,7 @@ public class DebugExtractor implements DebuggerCommand {
                     for (Map.Entry<Field, Value> entry : fieldMap.entrySet()) {
                         Field field = entry.getKey();
                         Value val = entry.getValue();
-                        valueAsString += "\n" + field.name() + ": " + valueAsString(val) + " || ";
+                        valueAsString += "\n" + field.name() + ": " + valueAsString(val) + "     ";
                     }
                 }
 
