@@ -64,6 +64,12 @@ public class DebugListener implements DebuggerContextListener, DebugProcessListe
                 && debuggerSession.isPaused()) {
             final SuspendContextImpl newSuspendContext = newContext.getSuspendContext();
             final StackFrameProxyImpl sfProxy = newContext.getFrameProxy();
+//            try {
+//                sfProxy.getStackFrame();
+//                setWatchPoints();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
 
             if (newSuspendContext != null) {
                 DebugProcess process = debuggerSession.getProcess();
@@ -75,22 +81,38 @@ public class DebugListener implements DebuggerContextListener, DebugProcessListe
         }
     }
 
+    private void setWatchPoints(ReferenceType referenceType) {
+        System.out.println("process ClassPrepare");
+        List<Field> fields = referenceType.visibleFields();
+        for (Field field : fields) {
+            System.out.println(field);
+            ModificationWatchpointRequest req =
+                    ((RequestManagerImpl)vmp.getDebugProcess().getRequestsManager())
+                            .createModificationWatchpointRequest(this, field);
+            for (int i=0; i<excludes.length; ++i) {
+                req.addClassExclusionFilter(excludes[i]);
+            }
+            req.setSuspendPolicy(EventRequest.SUSPEND_NONE);
+            req.enable();
+        }
+    }
+
     /**
      * Creates a class prepare request and registers it with the virtual machine.
      * @param vmp
      */
     private void setClassPrepareRequest(VirtualMachineProxyImpl vmp) {
-        EventRequestManager mgr = vmp.eventRequestManager();
-
-        ClassPrepareRequest cpr = mgr.createClassPrepareRequest();
-        for (int i=0; i<excludes.length; ++i) {
-            cpr.addClassExclusionFilter(excludes[i]);
-        }
-        cpr.setSuspendPolicy(EventRequest.SUSPEND_ALL);
-        cpr.enable();
-
-        ((RequestManagerImpl)vmp.getDebugProcess().getRequestsManager()).registerRequestInternal
-                (this, cpr);
+//        EventRequestManager mgr = vmp.eventRequestManager();
+//
+//        ClassPrepareRequest cpr = mgr.createClassPrepareRequest();
+//        for (int i=0; i<excludes.length; ++i) {
+//            cpr.addClassExclusionFilter(excludes[i]);
+//        }
+//        cpr.setSuspendPolicy(EventRequest.SUSPEND_ALL);
+//        cpr.enable();
+//
+//        ((RequestManagerImpl)vmp.getDebugProcess().getRequestsManager()).registerRequestInternal
+//                (this, cpr);
     }
 
     /**
@@ -131,19 +153,19 @@ public class DebugListener implements DebuggerContextListener, DebugProcessListe
      */
     @Override
     public void processClassPrepare(DebugProcess debuggerProcess, ReferenceType referenceType) {
-        System.out.println("process ClassPrepare");
-        List<Field> fields = referenceType.visibleFields();
-        for (Field field : fields) {
-            System.out.println(field);
-            ModificationWatchpointRequest req =
-                    ((RequestManagerImpl)vmp.getDebugProcess().getRequestsManager())
-                            .createModificationWatchpointRequest(this, field);
-            for (int i=0; i<excludes.length; ++i) {
-                req.addClassExclusionFilter(excludes[i]);
-            }
-            req.setSuspendPolicy(EventRequest.SUSPEND_NONE);
-            req.enable();
-        }
+//        System.out.println("process ClassPrepare");
+//        List<Field> fields = referenceType.visibleFields();
+//        for (Field field : fields) {
+//            System.out.println(field);
+//            ModificationWatchpointRequest req =
+//                    ((RequestManagerImpl)vmp.getDebugProcess().getRequestsManager())
+//                            .createModificationWatchpointRequest(this, field);
+//            for (int i=0; i<excludes.length; ++i) {
+//                req.addClassExclusionFilter(excludes[i]);
+//            }
+//            req.setSuspendPolicy(EventRequest.SUSPEND_NONE);
+//            req.enable();
+//        }
     }
 
     /**
@@ -156,11 +178,11 @@ public class DebugListener implements DebuggerContextListener, DebugProcessListe
      */
     @Override
     public boolean processLocatableEvent(SuspendContextCommandImpl action, LocatableEvent event) throws EventProcessingException {
-        System.out.println("process LocatableEvent");
-        if (event instanceof ModificationWatchpointEvent) {
-            DebugExtractor extractor = new DebugExtractor();
-            extractor.fieldUpdate((ModificationWatchpointEvent) event);
-        }
+//        System.out.println("process LocatableEvent");
+//        if (event instanceof ModificationWatchpointEvent) {
+//            DebugExtractor extractor = new DebugExtractor();
+//            extractor.fieldUpdate((ModificationWatchpointEvent) event);
+//        }
         return true;
     }
 

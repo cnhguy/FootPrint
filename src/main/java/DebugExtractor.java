@@ -1,8 +1,8 @@
 import com.intellij.debugger.engine.DebugProcess;
 import com.intellij.debugger.engine.managerThread.DebuggerCommand;
 import com.intellij.debugger.jdi.StackFrameProxyImpl;
-import com.sun.jdi.*;
 
+import com.sun.jdi.*;
 import com.sun.tools.jdi.ArrayReferenceImpl;
 import com.sun.jdi.event.ModificationWatchpointEvent;
 
@@ -45,6 +45,17 @@ public class DebugExtractor implements DebuggerCommand {
     public void action() {
         try {
             StackFrame frame = frameProxy.getStackFrame();
+
+            // Retrieve and cache all fields in "this" object/class of the frame.
+            // Works for static instances as well
+            ReferenceType referenceType = frameProxy.location().declaringType();
+            List<Field> fields = referenceType.fields();
+            for (Field field : fields) {
+                Value value = referenceType.getValue(field);
+                cache.put(field, frame.location().lineNumber(), valueAsString(value));
+            }
+
+            // Retrieve and cache all local var on the frame
             List<LocalVariable> localVariables = frame.visibleVariables();
             Map<LocalVariable, Value> map = frame.getValues(localVariables);
             updateCache(map);
@@ -62,11 +73,11 @@ public class DebugExtractor implements DebuggerCommand {
      * @param e watchpoint event
      */
     public void fieldUpdate(ModificationWatchpointEvent e) {
-        System.out.println("process ModificationWatchpointEvent");
-        Field field = e.field();
-        Value value = e.valueToBe();
-        cache.put(field, e.location().lineNumber(), valueAsString(value));
-        cache.pushChangeToUI();
+//        System.out.println("process ModificationWatchpointEvent");
+//        Field field = e.field();
+//        Value value = e.valueToBe();
+//        cache.put(field, e.location().lineNumber(), valueAsString(value));
+//        cache.pushChangeToUI();
     }
 
     /**
@@ -79,6 +90,7 @@ public class DebugExtractor implements DebuggerCommand {
         if (value != null) {
             valueAsString = value.toString();
             if (value instanceof StringReference) {
+                // if value is a string, just use it
                 valueAsString = ((StringReference) value).value();
             } else if (value instanceof ArrayReferenceImpl) {
                 // If the value is an array, print it out in array format --> [x, y, z]
@@ -91,28 +103,44 @@ public class DebugExtractor implements DebuggerCommand {
                 }
                 // append the last element without the comma
                 if (length > 0) {
-                    valueAsString += valueAsArray.getValue(length - 1);
+                    Value val = valueAsArray.getValue(length - 1);
+                    valueAsString += valueAsString(val);
                 }
                 valueAsString += "]";
             } else if (value instanceof ObjectReference) {
-                // if value is an object that is not a string, call the objects toString()
-                ObjectReference or = (ObjectReference) value;
-                ReferenceType ref = or.referenceType();
-                List<Method> methods = ref.methodsByName("toString");
-                try {
-                    Value toString = or.invokeMethod(frameProxy.threadProxy().getThreadReference(),
-                            methods.get(0), Collections.EMPTY_LIST, ObjectReference.INVOKE_SINGLE_THREADED);
-                    valueAsString = toString.toString();
-                } catch (Exception e) {
-                    e.printStackTrace();
+                valueAsString = "";
+                ObjectReference valueAsObject = (ObjectReference) value;
+                ReferenceType referenceType = valueAsObject.referenceType();
+
+                if (referenceType.toString().contains("java.util")) {
+                    // if the object is of java.util.*, invoke the toString() method
+                    List<Method> methods = referenceType.methodsByName("toString");
+                    try {
+                        Value toString = valueAsObject.invokeMethod(frameProxy.threadProxy().getThreadReference(),
+                                methods.get(0), Collections.EMPTY_LIST, ObjectReference.INVOKE_SINGLE_THREADED);
+                        valueAsString = toString.toString();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    // else, represent it as its fields
+                    List<Field> fieldList = referenceType.visibleFields();
+                    Map<Field, Value> fieldMap = valueAsObject.getValues(fieldList);
+
+                    for (Map.Entry<Field, Value> entry : fieldMap.entrySet()) {
+                        Field field = entry.getKey();
+                        Value val = entry.getValue();
+                        valueAsString += "\n" + field.name() + ": " + valueAsString(val) + " || ";
+                    }
                 }
+
             }
         }
         return valueAsString;
     }
 
     /**
-     * Helper method to easily send local varaibles to the cache.
+     * Helper method to easily send local variables to the cache.
      *
      * @param map map of local variables and their values on the stackframe
      */
