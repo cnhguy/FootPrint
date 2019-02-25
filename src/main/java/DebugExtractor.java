@@ -1,4 +1,6 @@
 import com.intellij.debugger.engine.DebugProcess;
+import com.intellij.debugger.engine.DebuggerManagerThreadImpl;
+import com.intellij.debugger.engine.SuspendContextImpl;
 import com.intellij.debugger.engine.managerThread.DebuggerCommand;
 import com.intellij.debugger.jdi.DecompiledLocalVariable;
 import com.intellij.debugger.jdi.LocalVariablesUtil;
@@ -6,6 +8,7 @@ import com.intellij.debugger.jdi.StackFrameProxyImpl;
 import com.intellij.openapi.util.text.StringUtil;
 import com.sun.jdi.*;
 
+import com.sun.jdi.event.BreakpointEvent;
 import com.sun.tools.jdi.ArrayReferenceImpl;
 import com.sun.tools.jdi.StringReferenceImpl;
 import com.sun.jdi.event.ModificationWatchpointEvent;
@@ -21,13 +24,15 @@ public class DebugExtractor implements DebuggerCommand {
 
     private StackFrameProxyImpl frameProxy;
     private DebugProcess debugProcess;
-    private DebugCache cache;
+    private static DebugCache cache;
+
+    private DebugListener debugListener;
 
     /**
      * Initializes with null frame proxy, null debug process, and the cache
      */
     public DebugExtractor() {
-        this(null, null);
+        this(null, null, null);
     }
 
     /**
@@ -35,10 +40,11 @@ public class DebugExtractor implements DebuggerCommand {
      * @param frameProxy
      * @param debugProcess
      */
-    public DebugExtractor(StackFrameProxyImpl frameProxy, DebugProcess debugProcess) {
+    public DebugExtractor(StackFrameProxyImpl frameProxy, DebugProcess debugProcess, DebugListener debugListener) {
         this.frameProxy = frameProxy;
         this.debugProcess = debugProcess;
         this.cache = DebugCache.getInstance();
+        this.debugListener = debugListener;
     }
 
     /**
@@ -50,6 +56,7 @@ public class DebugExtractor implements DebuggerCommand {
             //System.out.println("current line number: " + frameProxy.location());
             // used intelliJ's LocalVariablesUtil to fetch variables in the current stackframe
             Map<DecompiledLocalVariable, Value> map = LocalVariablesUtil.fetchValues(frameProxy, debugProcess, true);
+            System.out.println(map);
             updateCache(map);
             System.out.println(cache);
             // for each local variable that we fetched, print out its value
@@ -61,11 +68,13 @@ public class DebugExtractor implements DebuggerCommand {
         }
     }
 
+
+
     /**
      * Used for ModificationWatchPointEvents. Gets the field name, value, and line number and sends to the cache.
      * @param e
      */
-    public void fieldUpdate(ModificationWatchpointEvent e) {
+    public void processModificationWatchPointEvent(ModificationWatchpointEvent e) {
         System.out.println("process ModificationWatchpointEvent");
         Field field = e.field();
         Value value = e.valueToBe();
@@ -73,7 +82,7 @@ public class DebugExtractor implements DebuggerCommand {
         cache.pushChangeToUI();
     }
 
-    private String valueAsString(Value value) {
+    public String valueAsString(Value value) {
         String valueAsString = null;
         if (value != null) {
             valueAsString = value.toString();
@@ -112,10 +121,11 @@ public class DebugExtractor implements DebuggerCommand {
      * Helper method to easily send local varaibles to the cache.
      * @param map
      */
-    private void updateCache(Map<DecompiledLocalVariable, Value> map) {
+    public void updateCache(Map<DecompiledLocalVariable, Value> map) {
         map.forEach(((var, val) -> {
             try {
                 String varName = StringUtil.join(var.getMatchedNames(), " | ");
+                System.out.println(varName + " " + frameProxy.location().lineNumber() + " " + valueAsString(val));
                 cache.put(varName, frameProxy.location().lineNumber(), valueAsString(val));
             } catch (Exception e) {
                 e.printStackTrace();

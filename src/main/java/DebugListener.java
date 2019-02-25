@@ -15,6 +15,7 @@ import com.intellij.debugger.requests.ClassPrepareRequestor;
 import com.intellij.debugger.ui.breakpoints.FilteredRequestor;
 import com.intellij.ui.classFilter.ClassFilter;
 import com.sun.jdi.*;
+import com.sun.jdi.event.BreakpointEvent;
 import com.sun.jdi.event.LocatableEvent;
 import com.sun.jdi.event.ModificationWatchpointEvent;
 import com.sun.jdi.request.*;
@@ -54,22 +55,22 @@ public class DebugListener implements DebuggerContextListener, DebugProcessListe
             DebugCache.getInstance().clear();
             FootPrintToolWindow.getInstance().reset();
         }
-        if (event == DebuggerSession.Event.PAUSE
-                || event == DebuggerSession.Event.CONTEXT
-                || event == DebuggerSession.Event.REFRESH
-                || event == DebuggerSession.Event.REFRESH_WITH_STACK
-                && debuggerSession.isPaused()) {
-            final SuspendContextImpl newSuspendContext = newContext.getSuspendContext();
-            final StackFrameProxyImpl sfProxy = newContext.getFrameProxy();
-
-            if (newSuspendContext != null) {
-                DebugProcess process = debuggerSession.getProcess();
-                DebugExtractor extractor = new DebugExtractor(sfProxy, process);
-                DebuggerManagerThreadImpl managerThread = newSuspendContext.getDebugProcess()
-                        .getManagerThread();
-                managerThread.invokeCommand(extractor);
-            }
-        }
+//        if (event == DebuggerSession.Event.PAUSE
+//                || event == DebuggerSession.Event.CONTEXT
+//                || event == DebuggerSession.Event.REFRESH
+//                || event == DebuggerSession.Event.REFRESH_WITH_STACK
+//                && debuggerSession.isPaused()) {
+//            final SuspendContextImpl newSuspendContext = newContext.getSuspendContext();
+//            final StackFrameProxyImpl sfProxy = newContext.getFrameProxy();
+//
+//            if (newSuspendContext != null) {
+//                DebugProcess process = debuggerSession.getProcess();
+//                DebugExtractor extractor = new DebugExtractor(sfProxy, process);
+//                DebuggerManagerThreadImpl managerThread = newSuspendContext.getDebugProcess()
+//                        .getManagerThread();
+//                managerThread.invokeCommand(extractor);
+//            }
+//        }
     }
 
     /**
@@ -130,8 +131,10 @@ public class DebugListener implements DebuggerContextListener, DebugProcessListe
     public void processClassPrepare(DebugProcess debuggerProcess, ReferenceType referenceType) {
         System.out.println("process ClassPrepare");
         registerModificationWatchPointRequests(debuggerProcess, referenceType);
+        registerBreakPointRequests(debuggerProcess, referenceType);
     }
 
+    //sets a breakpoint on every line of executable source code
     private void registerBreakPointRequests(DebugProcess debuggerProcess, ReferenceType referenceType) {
         List<Location> executableLines;
         try {
@@ -140,18 +143,21 @@ public class DebugListener implements DebuggerContextListener, DebugProcessListe
             exc.printStackTrace();
             return;
         }
+        RequestManagerImpl requestManager = (RequestManagerImpl)debuggerProcess.getRequestsManager();
         for (Location loc : executableLines) {
-            BreakpointRequest breakpointRequest;
+            BreakpointRequest req = requestManager.createBreakpointRequest(this, loc);
+            req.setSuspendPolicy(EventRequest.SUSPEND_NONE);
+            req.enable();
         }
     }
 
     private void registerModificationWatchPointRequests(DebugProcess debuggerProcess, ReferenceType referenceType) {
         List<Field> fields = referenceType.visibleFields();
+        RequestManagerImpl requestManager = (RequestManagerImpl)debuggerProcess.getRequestsManager();
         for (Field field : fields) {
             System.out.println(field);
             ModificationWatchpointRequest req =
-                    ((RequestManagerImpl)debuggerProcess.getRequestsManager())
-                            .createModificationWatchpointRequest(this, field);
+                    requestManager.createModificationWatchpointRequest(this, field);
             for (int i=0; i<excludes.length; ++i) {
                 req.addClassExclusionFilter(excludes[i]);
             }
@@ -160,6 +166,8 @@ public class DebugListener implements DebuggerContextListener, DebugProcessListe
         }
     }
 
+
+    private ThreadReference thread;
     /**
      * Callback for Locatable events. If they are ModificationWatchPoint events, then creates an extractor to get the
      * field's value.
@@ -170,11 +178,50 @@ public class DebugListener implements DebuggerContextListener, DebugProcessListe
      */
     @Override
     public boolean processLocatableEvent(SuspendContextCommandImpl action, LocatableEvent event) throws EventProcessingException {
-        System.out.println("process LocatableEvent");
+        System.out.println("\nprocess LocatableEvent suspended: " + event.thread().isSuspended());
         if (event instanceof ModificationWatchpointEvent) {
             DebugExtractor extractor = new DebugExtractor();
-            extractor.fieldUpdate((ModificationWatchpointEvent) event);
+            extractor.processModificationWatchPointEvent((ModificationWatchpointEvent) event);
+        } else if (event instanceof BreakpointEvent) {
+            BreakpointEvent breakpointEvent = (BreakpointEvent)event;
+            System.out.println("BreakPointEvent line: " + breakpointEvent.location().lineNumber());
+//            final SuspendContextImpl newSuspendContext = action.getSuspendContext();
+//            final StackFrameProxyImpl sfProxy = action.getSuspendContext().getFrameProxy();
+//
+//            if (newSuspendContext != null && event.thread().isAtBreakpoint()) {
+//                System.out.println("extractor run");
+//                DebugProcess process = debuggerSession.getProcess();
+//                DebugExtractor extractor = new DebugExtractor(sfProxy, process, this);
+//                DebuggerManagerThreadImpl managerThread = newSuspendContext.getDebugProcess()
+//                        .getManagerThread();
+//                managerThread.invokeCommand(extractor);
+//            }
+            try {
+                ThreadReference thread = event.thread();
+//                for (StackFrame frame : thread.frames()) {
+//                    System.out.println(frame.visibleVariables());
+//                }
+                StackFrame stackFrame = thread.frame(0); //current stack frame
+                DebugCache cache = DebugCache.getInstance();
+                for (LocalVariable var : stackFrame.visibleVariables()) {
+                    Value val = stackFrame.getValue(var);
+                    if (val instanceof PrimitiveValue) {
+                        if (val instanceof IntegerValue) {
+                            IntegerValue integerValue = (IntegerValue) val;
+                            int intval = integerValue.value();
+                            System.out.println(breakpointEvent.location().lineNumber() + "\t" + var + ": " + intval);
+                            cache.put(var.name(), breakpointEvent.location().lineNumber(), String.valueOf(intval));
+                        }
+                    } else {
+                        //do something
+                    }
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
+//        if (event.thread().isSuspended())
+//            event.thread().resume();
         return true;
     }
 
