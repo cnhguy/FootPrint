@@ -64,9 +64,11 @@ public class DebugExtractor implements DebuggerCommand {
                 ReferenceType referenceType = frameProxy.location().declaringType();
                 List<Field> fields = referenceType.fields();
                 for (Field field : fields) {
+
                     Value value = referenceType.getValue(field);
                     cache.put(field, frame.location().lineNumber(), valueAsString(value));
                 }
+
             }
 
 
@@ -88,6 +90,7 @@ public class DebugExtractor implements DebuggerCommand {
      * @param e watchpoint event
      */
     public void fieldUpdate(ModificationWatchpointEvent e) {
+
 //        System.out.println("process ModificationWatchpointEvent");
 //        Field field = e.field();
 //        Value value = e.valueToBe();
@@ -123,16 +126,28 @@ public class DebugExtractor implements DebuggerCommand {
                 }
                 valueAsString += "]";
             } else if (value instanceof ObjectReference) {
-                valueAsString = "";
                 ObjectReference valueAsObject = (ObjectReference) value;
                 ReferenceType referenceType = valueAsObject.referenceType();
 
-                if (referenceType.toString().contains("java.util")) {
-                    // if the object is of java.util.*, invoke the toString() method
+                valueAsString = "";
+
+
+                if (referenceType.toString().contains("java.")) {
+                    // if the object is of java.*, invoke the toString() method
                     List<Method> methods = referenceType.methodsByName("toString");
+
+                    // find the default toString() method
+                    Method toStringMethod = null;
+                    for (Method m : methods) {
+                        if (m.argumentTypeNames().size() == 0) {
+                            toStringMethod = m;
+                            break;
+                        }
+                    }
+
                     try {
                         Value toString = valueAsObject.invokeMethod(frameProxy.threadProxy().getThreadReference(),
-                                methods.get(0), Collections.EMPTY_LIST, ObjectReference.INVOKE_SINGLE_THREADED);
+                                toStringMethod, Collections.EMPTY_LIST, ObjectReference.INVOKE_SINGLE_THREADED);
                         valueAsString = toString.toString();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -145,7 +160,7 @@ public class DebugExtractor implements DebuggerCommand {
                     for (Map.Entry<Field, Value> entry : fieldMap.entrySet()) {
                         Field field = entry.getKey();
                         Value val = entry.getValue();
-                        valueAsString += "\n" + field.name() + ": " + valueAsString(val) + "     ";
+                        valueAsString += "\n" + field.name() + ": " + val + "     ";
                     }
                 }
 
