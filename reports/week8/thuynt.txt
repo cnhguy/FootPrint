@@ -1,0 +1,32 @@
+Previous Goals:
+
+- add more tests for all classes
+- add field watchpoints
+- add documentation
+- deal with objects, how to store, how to display
+- continue working on UI
+
+This Week:
+
+When FootPrint loads, it now tracks fields of the class it is debugging (if available)
+as well as any local variables of methods it is in. Adding watchpoints to every
+loaded class cluttered up the UI a lot and caused some issues, so we only watch
+fields of the class that FootPrint is debugging. For our UI, we call the toString()
+method for objects in java.util and otherwise we display fields. This works
+for fields that reference other objects with fields as well (these will also be displayed).
+Our group was a bit conflicted on the issue of whether or not a toString() call would
+be sufficient to represent the data, so this is our compromise for now but we would
+like additional input from the staff. Our UI is functional but currently will
+display a value on a single line, even if it is a list of fields. The variable names
+are also not organized in any way, which can be confusing for users. We are still
+trying to set breakpoints so that FootPrint can get a complete history of variables.
+After we set these and refine our UI a bit, I think we will be done with implementation.
+We've also added documentation to most of our methods and classes.
+
+Goals:
+
+- Finish UI, improve organization of variables
+- Set breakpoints under the hood
+- Finalize how we will display values
+- Create integration tests
+- Run the experiments outlined in our report
