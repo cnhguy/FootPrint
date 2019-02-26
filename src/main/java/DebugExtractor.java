@@ -181,9 +181,10 @@ public class DebugExtractor implements DebuggerCommand {
                 }
             }
 
-            Value toString = object.invokeMethod(frameProxy.threadProxy().getThreadReference(),
-                    toStringMethod, Collections.EMPTY_LIST, ObjectReference.INVOKE_SINGLE_THREADED);
-            return toString.toString();
+            ThreadReference threadRef = frameProxy.threadProxy().getThreadReference();
+            Value toString = object.invokeMethod(threadRef, toStringMethod,
+                    Collections.EMPTY_LIST, ObjectReference.INVOKE_SINGLE_THREADED);
+            return trimQuotes(toString.toString());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -224,6 +225,18 @@ public class DebugExtractor implements DebuggerCommand {
             }
         }));
         cache.pushChangeToUI();
+    }
+
+    /**
+     * Trim quotes at the beginning and end
+     * @param string string to strip
+     * @return non-quoted string
+     */
+    private String trimQuotes(String string) {
+        if (string.length() >= 2 && string.charAt(0) == '"' && string.charAt(string.length() - 1) == '"') {
+            string = string.substring(1, string.length() - 1);
+        }
+        return string;
     }
 
     /**
