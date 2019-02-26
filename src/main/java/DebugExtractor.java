@@ -1,14 +1,16 @@
 import com.intellij.debugger.engine.DebugProcess;
+import com.intellij.debugger.engine.evaluation.EvaluateException;
 import com.intellij.debugger.engine.managerThread.DebuggerCommand;
 import com.intellij.debugger.jdi.StackFrameProxyImpl;
 
 import com.sun.jdi.*;
 import com.sun.tools.jdi.ArrayReferenceImpl;
-import com.sun.jdi.event.ModificationWatchpointEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Extracts variable information
@@ -43,10 +45,36 @@ public class DebugExtractor implements DebuggerCommand {
      */
     @Override
     public void action() {
+        extractFields();
+        extractLocalVariables();
+
+        // TODO: Remove
+        System.out.println(cache);
+        System.out.println("---------------");
+    }
+
+    /**
+     * Extract and cache local variables on the stackframe
+     */
+    private void extractLocalVariables() {
         try {
             StackFrame frame = frameProxy.getStackFrame();
+            List<LocalVariable> localVariables = frame.visibleVariables();
+            Map<LocalVariable, Value> map = frame.getValues(localVariables);
+            updateCache(map);
+        } catch (AbsentInformationException e) {
+            e.printStackTrace();
+        } catch (EvaluateException e) {
+            e.printStackTrace();
+        }
+    }
 
-            // Retrieve and cache fields of the current frame
+    /**
+     * Extract and cache fields visible to the debugger
+     */
+    private void extractFields() {
+        try {
+            StackFrame frame = frameProxy.getStackFrame();
             ObjectReference thisObject = frame.thisObject();
             if (thisObject != null) {
                 // if the frame is in an object
@@ -70,32 +98,9 @@ public class DebugExtractor implements DebuggerCommand {
                 }
 
             }
-
-
-            // Retrieve and cache all local var on the frame
-            List<LocalVariable> localVariables = frame.visibleVariables();
-            Map<LocalVariable, Value> map = frame.getValues(localVariables);
-            updateCache(map);
-
-            System.out.println(cache);
-            System.out.println("---------------");
-        } catch (Exception e) {
+        } catch (EvaluateException e) {
             e.printStackTrace();
         }
-    }
-
-    /**
-     * Used for ModificationWatchPointEvents. Gets the field name, value, and line number and sends to the cache.
-     *
-     * @param e watchpoint event
-     */
-    public void fieldUpdate(ModificationWatchpointEvent e) {
-
-//        System.out.println("process ModificationWatchpointEvent");
-//        Field field = e.field();
-//        Value value = e.valueToBe();
-//        cache.put(field, e.location().lineNumber(), valueAsString(value));
-//        cache.pushChangeToUI();
     }
 
     /**
@@ -112,60 +117,96 @@ public class DebugExtractor implements DebuggerCommand {
                 valueAsString = ((StringReference) value).value();
             } else if (value instanceof ArrayReferenceImpl) {
                 // If the value is an array, print it out in array format --> [x, y, z]
-                ArrayReferenceImpl valueAsArray = (ArrayReferenceImpl) value;
-                int length = valueAsArray.length();
-                valueAsString = "[";
-                for (int i = 0; i < length - 1; i++) {
-                    Value val = valueAsArray.getValue(i);
-                    valueAsString += valueAsString(val) + ", ";
-                }
-                // append the last element without the comma
-                if (length > 0) {
-                    Value val = valueAsArray.getValue(length - 1);
-                    valueAsString += valueAsString(val);
-                }
-                valueAsString += "]";
+                valueAsString = getValueFromArrayReference((ArrayReferenceImpl) value);
             } else if (value instanceof ObjectReference) {
-                ObjectReference valueAsObject = (ObjectReference) value;
-                ReferenceType referenceType = valueAsObject.referenceType();
-
-                valueAsString = "";
-
-
-                if (referenceType.toString().contains("java.")) {
-                    // if the object is of java.*, invoke the toString() method
-                    List<Method> methods = referenceType.methodsByName("toString");
-
-                    // find the default toString() method
-                    Method toStringMethod = null;
-                    for (Method m : methods) {
-                        if (m.argumentTypeNames().size() == 0) {
-                            toStringMethod = m;
-                            break;
-                        }
-                    }
-
-                    try {
-                        Value toString = valueAsObject.invokeMethod(frameProxy.threadProxy().getThreadReference(),
-                                toStringMethod, Collections.EMPTY_LIST, ObjectReference.INVOKE_SINGLE_THREADED);
-                        valueAsString = toString.toString();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    // else, represent it as its fields
-                    List<Field> fieldList = referenceType.visibleFields();
-                    Map<Field, Value> fieldMap = valueAsObject.getValues(fieldList);
-
-                    for (Map.Entry<Field, Value> entry : fieldMap.entrySet()) {
-                        Field field = entry.getKey();
-                        Value val = entry.getValue();
-                        valueAsString += "\n" + field.name() + ": " + val + "     ";
-                    }
-                }
-
+                valueAsString = getValueFromObjectReference((ObjectReference) value);
             }
         }
+        return valueAsString;
+    }
+
+    /**
+     * Get the object reference's value. If the object belongs to java.*, returns
+     * the toString() result; otherwise represent it as its fields
+     * @param object object to extract
+     * @return object's string representation
+     */
+    private String getValueFromObjectReference(ObjectReference object) {
+        ReferenceType referenceType = object.referenceType();
+
+        if (referenceType.toString().contains("java.")) {
+            // if the object is of java.*, invoke the toString() method
+            return invokeToString(object);
+        } else {
+            // else, represent it as its fields
+            return getFieldsAsString(object);
+        }
+    }
+
+    /**
+     * Returns the fields within an object as a string
+     * @param object object whose field to extract
+     * @return the fields within an object
+     */
+    private String getFieldsAsString(ObjectReference object) {
+        String fieldsAsString = "";
+        ReferenceType referenceType = object.referenceType();
+        List<Field> fieldList = referenceType.visibleFields();
+        Map<Field, Value> fieldMap = object.getValues(fieldList);
+
+        for (Map.Entry<Field, Value> entry : fieldMap.entrySet()) {
+            Field field = entry.getKey();
+            Value val = entry.getValue();
+            fieldsAsString += "\n" + field.name() + ": " + valueAsString(val) + "     ";
+        }
+        return fieldsAsString;
+    }
+
+    /**
+     * Invoke the toString() method of an object
+     * @param object Object we want to extract
+     * @return object's toString() result
+     */
+    private String invokeToString(ObjectReference object) {
+        try {
+            ReferenceType referenceType = object.referenceType();
+            List<Method> methods = referenceType.methodsByName("toString");
+
+            // find the toString() method with no argument
+            Method toStringMethod = null;
+            for (Method m : methods) {
+                if (m.argumentTypeNames().size() == 0) {
+                    toStringMethod = m;
+                    break;
+                }
+            }
+
+            Value toString = object.invokeMethod(frameProxy.threadProxy().getThreadReference(),
+                    toStringMethod, Collections.EMPTY_LIST, ObjectReference.INVOKE_SINGLE_THREADED);
+            return toString.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    /**
+     * Returns an array as a string
+     * @param value the array
+     * @return array as a string
+     */
+    @NotNull
+    private String getValueFromArrayReference(ArrayReferenceImpl value) {
+        String valueAsString;
+        ArrayReferenceImpl valueAsArray = value;
+        valueAsString = "[";
+        List<String> arrayValues =
+                valueAsArray.getValues()
+                        .stream()
+                        .map((Value v) -> valueAsString(v))
+                        .collect(Collectors.toList());
+        valueAsString += String.join(", ", arrayValues);
+        valueAsString += "]";
         return valueAsString;
     }
 
