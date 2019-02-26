@@ -12,7 +12,6 @@
          on how to target different products -->
     <depends>com.intellij.modules.lang</depends>
 
-
     <extensions defaultExtensionNs="com.intellij">
         <programRunner implementation="ProgramRunner"/>
         <executor implementation="FootPrint_Executor"/>
@@ -29,4 +28,6 @@
             <add-to-group group-id="RunnerActions" anchor="last"/>
         </action>
     </actions>
+
+
 </idea-plugin>
