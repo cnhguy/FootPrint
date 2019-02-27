@@ -1,3 +1,5 @@
+import com.intellij.openapi.ui.popup.JBPopupFactory;
+import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
 import com.sun.jdi.Field;
@@ -14,9 +16,9 @@ import javax.swing.table.DefaultTableModel;
  */
 public class FootPrintToolWindow {
     private static FootPrintToolWindow INSTANCE;
-
+//initiliza a cache
     private final DebugCache cache;
-
+//Construct the variables
     private GridLayout layout;
     private JPanel content;
     private JScrollPane leftScrollPane;
@@ -35,12 +37,12 @@ public class FootPrintToolWindow {
             return INSTANCE;
         }
     }
-
+//initilize the cache, and the initComponents
     private FootPrintToolWindow () {
         cache = DebugCache.getInstance();
         initComponents();
     }
-
+//Setup the components
     private void initComponents() {
         layout = new GridLayout(0,2);
         content = new JPanel();
@@ -84,6 +86,7 @@ public class FootPrintToolWindow {
 
     /**
      * The set DebugCache should call this method to notify this class of a change in the cache and to update accordingly
+     * The cacheChanges() will load the left table.
      **/
     public void cacheChanged() {
         DefaultTableModel leftTableModel = (DefaultTableModel)leftTable.getModel();
@@ -113,15 +116,18 @@ public class FootPrintToolWindow {
         if (leftTableSelection != -1) {
             leftTable.setRowSelectionInterval(leftTableSelection, leftTableSelection);
         }
-        //the mostRecentUpdats should reflect the updates from a specific variable, and later appened into the indexed row
+
     }
 
 
+
+    /**
+     * The righttable is displaying the line number and values according to the selection in the left table
+     * @param leftTableVarIndex
+     */
     private void updateRightTable(int leftTableVarIndex) {
         if (leftTableVarIndex == -1)
             return;
-//        System.out.println("update right table with row: " + leftTableRow);
-        //link the leftTableRow to the Variable it is referring to
         DefaultTableModel rightTableModel = (DefaultTableModel)rightTable.getModel();
         //set visible to false to avoid a race condition
         rightTable.setVisible(false);
@@ -134,11 +140,15 @@ public class FootPrintToolWindow {
             rightTableModel.addRow(rowData);
         }
         rightTable.setVisible(true);
-        //Updating from getMostRecentUpdate
-        //Object[] rowData = {cache.getHistory(leftTableVariable).get(i).getLine(),cache.getHistory(leftTableVariable).get(i).getValue()};
-        //rightTableModel.addRow(cache.getMostRecentUpdate());
+
 
     }
+
+    /**
+     *     Displays notification everytime there is a mostrecentupdate called
+     *     Object[] rowData = {cache.getHistory(leftTableVariable).get(i).getLine(),cache.getHistory(leftTableVariable).get(i).getValue()};
+     *     rightTableModel.addRow(cache.getMostRecentUpdate());
+     */
 
     /**
      * returns the content to be displayed by the ToolWindow

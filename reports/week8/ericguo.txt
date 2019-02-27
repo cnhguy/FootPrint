@@ -1,0 +1,12 @@
+1. Previous goals:
+    -finish the basic UI functionality:
+      -displaying arrays
+      -displaying changes in the history
+    -research new ways to get local variable states 
+2. This week, I began looking into ways to set breakpoints automatically and to
+   use those breakpoints to extract the variable information. Right now, I am 
+   having difficulty correctly extracting the information after a breakpoint is
+   reached.
+3. Future goals:
+    -finish using breakpoints to get local variable states
+    -research other ways to display variables (esp. objects) in the ui
