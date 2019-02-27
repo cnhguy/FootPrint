@@ -1,7 +1,14 @@
 [![Build Status](https://travis-ci.com/cnhguy/FootPrint.svg?branch=master)](https://travis-ci.com/cnhguy/FootPrint)
 
 # FootPrint: Variable History Viewer
+### Current status:
+We have a working UI that tracks the histories of all local variables and fields as the user steps through the debugger.
+This works for both primitives and objects. Objects are displayed via their fields, and whenever a field changes, 
+that object's history will be recorded to reflect that change. We can also display Java classes such as Collections by invoking their toString() method. Variables with the name but were declared in different scopes are differentiated in our UI.
 
+We are currently working on implementing breakpoints under the hood so we can get variables histories before we reach
+the user's breakpoint. We are also looking into refining our UI so users can have the option to choose what variable they
+want to track and organize those variables according what methods and classes they belong to. 
 
 # User Manual
 
