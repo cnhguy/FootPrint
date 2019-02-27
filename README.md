@@ -90,9 +90,9 @@ Congrats you have cloned the repository.
 
 Once you have cloned the repo, you can follow these instructions to import the project to IntelliJ:
 
-2) On the Intellij start page, select Import and then select the FootPrint folder and follow the prompts
-3) Once FootPrint is imported, you will see a pop-up that says `Unlinked Gradle Project`; select the option to link it
-4) Select `use gradle 'wrapper' task configuration` and continue (the other default settings can be kept if desired)
+1) On the Intellij start page, select Import and then select the FootPrint folder and follow the prompts
+2) Once FootPrint is imported, you will see a pop-up that says `Unlinked Gradle Project`; select the option to link it
+3) Select `use gradle 'wrapper' task configuration` and continue (the other default settings can be kept if desired)
 
 Congrats! You imported the project to IntelliJ.
 
