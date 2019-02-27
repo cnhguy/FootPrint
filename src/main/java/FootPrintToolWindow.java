@@ -2,12 +2,12 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
+import com.sun.jdi.Field;
+import com.sun.jdi.LocalVariable;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.lang.Object.*;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.table.DefaultTableModel;
 
@@ -64,7 +64,7 @@ public class FootPrintToolWindow {
     }
 
     /**
-     * Reset the content to the intial state.
+     * Reset the content to the initial state.
      */
     public void reset() {
         leftTable.setVisible(false);
@@ -80,7 +80,10 @@ public class FootPrintToolWindow {
         rightTable.setVisible(true);
     }
 
-    private List<String> vars;
+    private List<LocalVariable> localVars;
+    private List<Field> fields;
+    private List<Object> vars;
+
     /**
      * The set DebugCache should call this method to notify this class of a change in the cache and to update accordingly
      * The cacheChanges() will load the left table.
@@ -91,12 +94,23 @@ public class FootPrintToolWindow {
         //set visible to false to avoid a race condition
         leftTable.setVisible(false);
         leftTableModel.setRowCount(0);
-        vars = cache.getAllVariables();
+        localVars = cache.getAllVariables();
+        fields = cache.getAllFields();
+        vars = new ArrayList<>();
 
-        for(int i = 0; i < vars.size(); i++) {
-            String[] rowData = {vars.get(i)};
+
+        for (LocalVariable v : localVars) {
+            String[] rowData = {v.name()};
             leftTableModel.addRow(rowData);
+            vars.add(v);
         }
+
+        for (Field f : fields) {
+            String[] rowData = {f.name()};
+            leftTableModel.addRow(rowData);
+            vars.add(f);
+        }
+
         leftTable.setVisible(true);
 
         if (leftTableSelection != -1) {
@@ -118,7 +132,7 @@ public class FootPrintToolWindow {
         //set visible to false to avoid a race condition
         rightTable.setVisible(false);
         rightTableModel.setRowCount(0);
-        String leftTableVariable = vars.get(leftTableVarIndex);
+        Object leftTableVariable = vars.get(leftTableVarIndex);
 
         List<VariableInfo> history = cache.getHistory(leftTableVariable);
         for(int i = 0; i < history.size(); i++) {

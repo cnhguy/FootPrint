@@ -45,6 +45,12 @@ public class VariableInfo {
         return line;
     }
 
+    /**
+     * Checks if this equals another object o
+     * @param o object to compare against
+     * @return true iff mequal, false otherwise
+     */
+    @Override
     public boolean equals(Object o) {
 
         // If the object is compared with itself then return true
