@@ -20,7 +20,7 @@ public class DebugAction extends AnAction{
 
     /**
      * Callback for button clicked. Initiates the debugging with FootPrint.
-     * @param e
+     * @param e FootPrint button event click
      */
     @Override
     public void actionPerformed(AnActionEvent e) {
