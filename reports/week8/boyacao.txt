@@ -1,0 +1,13 @@
+Goals from Week 7
+-Right now the line numbers are displayed in a wrong way: they are displaying the breakpoints' line numbers instead of the actual line numbers that the varibles change. We are trying to solve this.
+-Try to implement getMostRecentUpdate into the user interface
+-Try to display and test more complicated cases
+
+Progress:
+-We tested more cases for the FootPrint, including not displaying fields, blank variable name, etc. We also found more bugs and solved them accordingly.
+-With more complicated cases we tried, we found that the history can be hard to fully displayed and we need to find a more user-frendly way to display complicated information. Now, we decided to display all the class, methods, value, line numbers together to clearly identify and display the information. This requires a reconstruction of backend and UI.
+-I was working with the popupwindows to better display messages and customized icon for footprint.
+
+Plans and Goals:
+-Refine the UI
+-Display the class and methods information
