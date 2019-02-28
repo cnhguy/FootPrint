@@ -82,7 +82,7 @@ Congrats! You have successfully used FootPrint.
 
 1) On the repository page, select `Clone or download` and copy the link provided
 2) `cd` into the directory in which you want to store the project
-3) run this command git clone <url> where the url is the link from step 1
+3) run the command `git clone <url>` where the url is the link from step 1
 
 Congrats you have cloned the repository.
 
