@@ -1,0 +1,18 @@
+1. Previous week’s plan: 
+ 	- Decide on how we want to represent the variable's histories
+ 	- Document methods and classes
+ 	- Implement UI to display objects and primitives
+ 	- Implement a way for users to specify what variables they want to track
+
+2. This week’s progress:
+	-We are now able to collecte both fields and local variables, when it is debugging, the footprint can record the information of the fields name and also the methods it belongs to
+	-Now, the collection objects are displayed in their toString() format while other objects are displayed via their fields.
+	-We created a UI mockup to better organize variables.Currently, the UI is only a two table toolwindow that displays very simple variable information. Once the data structure get messy, or if there are same name variables, the UI can be vague to display the information. We designed a UI to display the class name, method name and variable value at the same time
+
+3. Next week’s plan:
+ 	-Working on setting breakpoints automatically so that footprint could extract full information 
+ 	-Building a better UI to display the information
+
+4. Meeting agenda:
+   1. How to set breakpoints automatically
+   2. How to do and what to do for the research questions, what aspects should we compare FootPrint with other execution process recorder like Chronon
