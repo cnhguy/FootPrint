@@ -1,7 +1,9 @@
 import com.sun.jdi.Field;
 import com.sun.jdi.LocalVariable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MasterCache {
@@ -57,5 +59,16 @@ public class MasterCache {
 
     public DebugCache getFieldsCache(String object) {
         return fields.get(object);
+    }
+
+    public List<String> getAllObjects() {
+        return new ArrayList<>(objects.keySet());
+    }
+
+    /**
+     * Notify the UI of changes to the cache.
+     */
+    public void pushChangeToUI() {
+        FootPrintToolWindow.getInstance().cacheChanged();
     }
 }

@@ -19,7 +19,7 @@ public class DebugExtractor implements DebuggerCommand {
 
     private StackFrameProxyImpl frameProxy;
     private DebugProcess debugProcess;
-    private DebugCache cache;
+    private MasterCache cache;
 
     /**
      * Initializes with null frame proxy, null debug process, and the cache
@@ -37,7 +37,7 @@ public class DebugExtractor implements DebuggerCommand {
     public DebugExtractor(StackFrameProxyImpl frameProxy, DebugProcess debugProcess) {
         this.frameProxy = frameProxy;
         this.debugProcess = debugProcess;
-        this.cache = DebugCache.getInstance();
+        this.cache = MasterCache.getInstance();
     }
 
     /**
@@ -85,6 +85,7 @@ public class DebugExtractor implements DebuggerCommand {
                 for (Map.Entry<Field, Value> entry : fieldMap.entrySet()) {
                     Field field = entry.getKey();
                     Value val = entry.getValue();
+
                     cache.put(field, frameProxy.location().lineNumber(), valueAsString(val));
                 }
             } else {
@@ -96,7 +97,6 @@ public class DebugExtractor implements DebuggerCommand {
                     Value value = referenceType.getValue(field);
                     cache.put(field, frame.location().lineNumber(), valueAsString(value));
                 }
-
             }
         } catch (EvaluateException e) {
             e.printStackTrace();
@@ -219,12 +219,32 @@ public class DebugExtractor implements DebuggerCommand {
     private void updateCache(Map<LocalVariable, Value> map) {
         map.forEach(((var, val) -> {
             try {
-                cache.put(var, frameProxy.location().lineNumber(), valueAsString(val));
+                VariableInfo info = new VariableInfo(frameProxy.location().lineNumber(), valueAsString(val));
+                String objectId = getObjectId();
+                String method = frameProxy.location().method().name();
+                cache.put(objectId, method, var, info);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }));
-        cache.pushChangeToUI();
+    }
+
+    private String getObjectId() {
+        try {
+            StackFrame frame = frameProxy.getStackFrame();
+            ObjectReference thisObject = frame.thisObject();
+            if (thisObject != null) {
+                return thisObject.toString();
+            } else {
+                // if the frame is in a native or static method
+                ReferenceType referenceType = frameProxy.location().declaringType();
+                referenceType.toString();
+                return referenceType.signature();
+            }
+        } catch (EvaluateException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**

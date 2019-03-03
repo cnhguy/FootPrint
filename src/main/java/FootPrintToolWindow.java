@@ -16,8 +16,8 @@ import javax.swing.table.DefaultTableModel;
  */
 public class FootPrintToolWindow {
     private static FootPrintToolWindow INSTANCE;
-//initiliza a cache
-    private final DebugCache cache;
+//initilize a cache
+    private final MasterCache cache;
 //Construct the variables
     private GridLayout layout;
     private JPanel content;
@@ -39,7 +39,7 @@ public class FootPrintToolWindow {
     }
 //initilize the cache, and the initComponents
     private FootPrintToolWindow () {
-        cache = DebugCache.getInstance();
+        cache = MasterCache.getInstance();
         initComponents();
     }
 //Setup the components
@@ -99,17 +99,30 @@ public class FootPrintToolWindow {
         vars = new ArrayList<>();
 
 
-        for (LocalVariable v : localVars) {
+        for (int i = localVars.size() - 1; i >= 0; i--) {
+            LocalVariable v = localVars.get(i);
             String[] rowData = {v.name()};
             leftTableModel.addRow(rowData);
             vars.add(v);
         }
 
-        for (Field f : fields) {
+        for (int i = fields.size() - 1; i >= 0; i--) {
+            Field f = fields.get(i);
             String[] rowData = {f.name()};
             leftTableModel.addRow(rowData);
             vars.add(f);
         }
+//        for (LocalVariable v : localVars) {
+//            String[] rowData = {v.name()};
+//            leftTableModel.addRow(rowData);
+//            vars.add(v);
+//        }
+//
+//        for (Field f : fields) {
+//            String[] rowData = {f.name()};
+//            leftTableModel.addRow(rowData);
+//            vars.add(f);
+//        }
 
         leftTable.setVisible(true);
 

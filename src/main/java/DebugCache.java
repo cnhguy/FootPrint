@@ -13,8 +13,6 @@ import java.util.*;
  */
 public class DebugCache {
 
-    private static DebugCache INSTANCE;
-
     /**
      * Map of local variables on the stack
      */
@@ -25,23 +23,10 @@ public class DebugCache {
      */
     private Map<Field, LinkedList<VariableInfo>> fields;
 
-    private DebugCache() {
-        vars = new HashMap<>();
-        fields = new HashMap<>();
+    public DebugCache() {
+        vars = new LinkedHashMap<>();
+        fields = new LinkedHashMap<>();
     }
-
-    /**
-     * Returns an instance of the cache
-     * @return an instance of the cache
-     */
-    public static DebugCache getInstance() {
-        synchronized (DebugCache.class) {
-            if (INSTANCE == null)
-                INSTANCE = new DebugCache();
-            return INSTANCE;
-        }
-    }
-
 
     /**
      * Returns the history of the var
@@ -88,36 +73,34 @@ public class DebugCache {
     /**
      * Adds the given information to the cache.
      * @param var variable
-     * @param line line number
-     * @param value variable's value
+     * @param update updated value
      */
-    public void put(LocalVariable var, Integer line, String value) {
+    public void put(LocalVariable var, VariableInfo update) {
         LinkedList<VariableInfo> info = vars.get(var);
         if (info == null) {
             info = new LinkedList<>();
         }
-        VariableInfo update = new VariableInfo(line, value);
         if (info.size() == 0 || !update.equals(info.getLast())) {
             info.add(update);
             vars.put(var, info);
+            pushChangeToUI();
         }
     }
 
     /**
      * Adds the given information to the cache.
      * @param field field
-     * @param line line number
-     * @param value variable's value
+     * @param update updated value
      */
-    public void put(Field field, Integer line, String value) {
+    public void put(Field field, VariableInfo update) {
         LinkedList<VariableInfo> info = fields.get(field);
         if (info == null) {
             info = new LinkedList<>();
         }
-        VariableInfo update = new VariableInfo(line, value);
         if (info.size() == 0 || !update.equals(info.getLast())) {
             info.add(update);
             fields.put(field, info);
+            pushChangeToUI();
         }
     }
 
