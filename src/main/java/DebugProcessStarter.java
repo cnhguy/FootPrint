@@ -24,8 +24,8 @@ public class DebugProcessStarter extends XDebugProcessStarter {
 
     /**
      * Returns a Java debugger process
-     * @param session
-     * @return
+     * @param session debugger session
+     * @return Java debugger process
      */
     @Override
     @NotNull

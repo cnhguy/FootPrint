@@ -1,0 +1,22 @@
+1) Goals from last week:
+- Complete VariableInfo class to give the UI all the information it needs
+  to display to the user (ex: Object's fields and value in a readable format, )
+- Test cache and extractor for the back end
+- Add comments to classes
+
+2) Progress:
+
+- Collection objects are displayed in their toString() format while
+  other objects are displayed via their fields. If a field changed in
+  said object, that change will be recorded by FootPrint and shown on
+  the UI accordingly under that object's history.
+- Collected fields and local variables on the stackframe
+- Created a UI mockup to better organize variables. Currently, variables
+  from different methods and classes are displayed together in one column.
+  However, it may be more useful if we can separate them by classes and methods
+  so users can better differentiate them.
+
+3) Goals for next week:
+- Implement revised UI to include two more columns (classes and methods)
+- Restructure cache to reflect the UI change
+- Test cache and extractor for the back end

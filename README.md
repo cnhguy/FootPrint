@@ -1,7 +1,14 @@
 [![Build Status](https://travis-ci.com/cnhguy/FootPrint.svg?branch=master)](https://travis-ci.com/cnhguy/FootPrint)
 
 # FootPrint: Variable History Viewer
+### Current status:
+We have a working UI that tracks the histories of all local variables and fields as the user steps through the debugger.
+This works for both primitives and objects. Objects are displayed via their fields, and whenever a field changes, 
+that object's history will be recorded to reflect that change. We can also display Java classes such as Collections by invoking their toString() method. Variables with the name but were declared in different scopes are differentiated in our UI.
 
+We are currently working on implementing breakpoints under the hood so we can get variables histories before we reach
+the user's breakpoint. We are also looking into refining our UI so users can have the option to choose what variable they
+want to track and organize those variables according what methods and classes they belong to. 
 
 # User Manual
 
@@ -74,11 +81,20 @@ Congrats! You have successfully used FootPrint.
 ## Cloning The Repository:
 
 1) On the repository page, select `Clone or download` and copy the link provided
-2) On the Intellij start page, select `Checkout from Version Control` and `Git`
-3) Paste the URL from step 1 into the URL field and choose your desired directory and hit `Clone`
-4) Select `use gradle 'wrapper' task configuration` and continue (the other default settings can be kept if desired)
+2) `cd` into the directory in which you want to store the project
+3) run the command `git clone <url>` where the url is the link from step 1
 
-Congrats! You have cloned the repository.
+Congrats you have cloned the repository.
+
+## Importing to IntelliJ
+
+Once you have cloned the repo, you can follow these instructions to import the project to IntelliJ:
+
+1) On the Intellij start page, select Import and then select the FootPrint folder and follow the prompts
+2) Once FootPrint is imported, you will see a pop-up that says `Unlinked Gradle Project`; select the option to link it
+3) Select `use gradle 'wrapper' task configuration` and continue (the other default settings can be kept if desired)
+
+Congrats! You imported the project to IntelliJ.
 
 ## Build and Test:
 
@@ -86,4 +102,8 @@ FootPrint uses Gradle as its build system. You can trigger a build by running `.
 
 This command will build the project and run any tests in the `/src/test/` folder.
 
-If you wish to test FootPrint in the IDE, you can select the `Gradle` option in IntelliJ located on the far right and double click `runIde`. This will launch a separate IntelliJ window where you will see the FootPrint icon in the upper right hand corner. Here, you may test the functionality of FootPrint.
+If you wish to test FootPrint in the IDE, you can use the `Gradle` Tool Window in IntelliJ. Then double click `footprint-plugin/Tasks/intellij/runIde`. This will launch a separate IntelliJ window where you will see the FootPrint icon in the upper right hand corner. Here, you may test the functionality of FootPrint.
+
+## Experiment Results:
+
+If you would like to view/reproduce our experimental data on FootPrint, the repo can be found [here](https://github.com/hangbuiii/FootPrintTest)
