@@ -1,9 +1,17 @@
-import com.intellij.debugger.engine.DebugProcess;
+import com.intellij.debugger.engine.*;
 import com.intellij.debugger.engine.evaluation.EvaluateException;
 import com.intellij.debugger.engine.managerThread.DebuggerCommand;
+import com.intellij.debugger.engine.requests.LocatableEventRequestor;
 import com.intellij.debugger.jdi.StackFrameProxyImpl;
 
+import com.intellij.debugger.ui.breakpoints.FilteredRequestor;
+import com.intellij.openapi.util.Key;
 import com.sun.jdi.*;
+import com.sun.jdi.event.Event;
+import com.sun.jdi.event.EventIterator;
+import com.sun.jdi.event.EventSet;
+import com.sun.jdi.request.BreakpointRequest;
+import com.sun.jdi.request.EventRequest;
 import com.sun.tools.jdi.ArrayReferenceImpl;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,29 +26,23 @@ import java.util.stream.Collectors;
 public class DebugExtractor implements DebuggerCommand {
 
     private StackFrameProxyImpl frameProxy;
-    private DebugProcess debugProcess;
+    private DebugProcessImpl debugProcess;
     private static DebugCache cache;
-
-    private DebugListener debugListener;
-
-    /**
-     * Initializes with null frame proxy, null debug process, and the cache
-     */
-    public DebugExtractor() {
-        this(null, null, null);
-    }
+    private static SuspendContextImpl suspendContext;
 
     /**
      * Creates a DebugExtractor
      *
      * @param frameProxy stack frame proxy
-     * @param debugProcess debugger process
+     * @param suspendContext suspend context
      */
-    public DebugExtractor(StackFrameProxyImpl frameProxy, DebugProcess debugProcess, DebugListener debugListener) {
+    public DebugExtractor(StackFrameProxyImpl frameProxy,
+                          SuspendContextImpl suspendContext) {
         this.frameProxy = frameProxy;
-        this.debugProcess = debugProcess;
+        this.debugProcess = suspendContext.getDebugProcess();
+        this.suspendContext = suspendContext;
+
         this.cache = DebugCache.getInstance();
-        this.debugListener = debugListener;
     }
 
     /**
@@ -52,8 +54,38 @@ public class DebugExtractor implements DebuggerCommand {
         extractLocalVariables();
 
         // TODO: Remove
-        System.out.println(cache);
-        System.out.println("---------------");
+//        System.out.println(cache);
+//        System.out.println("---------------");
+
+        resumeIfOnlyRequestor();
+    }
+
+    /**
+     * Check if we are the only ones requesting to stop
+     * If yes, then resume the execution. If not then wait
+     */
+    private void resumeIfOnlyRequestor() {
+        SuspendManager suspendManager = debugProcess.getSuspendManager();
+        boolean isOnlyEventRequest = true;
+        outer:
+        for (SuspendContextImpl context : suspendManager.getEventContexts()) {
+            EventSet events = context.getEventSet();
+            EventIterator eventIterator = events.eventIterator();
+            while (eventIterator.hasNext()) {
+                Event e = eventIterator.nextEvent();
+                EventRequest request = e.request();
+                if (request instanceof BreakpointRequest) {
+                    Object o = request.getProperty(Key.findKeyByName("Requestor"));
+                    if (o != null && o instanceof DebugListener) {
+                        continue;
+                    }
+                }
+                isOnlyEventRequest = false;
+                break outer;
+            }
+        }
+        if (isOnlyEventRequest)
+            suspendManager.resume(suspendContext);
     }
 
     /**
