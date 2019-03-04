@@ -6,7 +6,7 @@ import com.sun.jdi.LocalVariable;
 import java.util.*;
 
 /**
- * Cache that holds info about local variables and fields on the stack. Maps the field or variable
+ * Cache that holds histories of local variables or fields. Maps the field or variable
  * to a list of VariableInfo object that holds its previous values
  * and the line number at which those values were assigned. Note that
  * values are only cached if they have changed.

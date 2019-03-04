@@ -89,29 +89,15 @@ public class FootPrintToolWindow {
      * The cacheChanges() will load the left table.
      **/
     public void cacheChanged() {
-        DefaultTableModel leftTableModel = (DefaultTableModel)leftTable.getModel();
-        int leftTableSelection = leftTable.getSelectedRow();
-        //set visible to false to avoid a race condition
-        leftTable.setVisible(false);
-        leftTableModel.setRowCount(0);
-        localVars = cache.getAllVariables();
-        fields = cache.getAllFields();
-        vars = new ArrayList<>();
-
-
-        for (int i = localVars.size() - 1; i >= 0; i--) {
-            LocalVariable v = localVars.get(i);
-            String[] rowData = {v.name()};
-            leftTableModel.addRow(rowData);
-            vars.add(v);
-        }
-
-        for (int i = fields.size() - 1; i >= 0; i--) {
-            Field f = fields.get(i);
-            String[] rowData = {f.name()};
-            leftTableModel.addRow(rowData);
-            vars.add(f);
-        }
+//        DefaultTableModel leftTableModel = (DefaultTableModel)leftTable.getModel();
+//        int leftTableSelection = leftTable.getSelectedRow();
+//        //set visible to false to avoid a race condition
+//        leftTable.setVisible(false);
+//        leftTableModel.setRowCount(0);
+//        localVars = cache.getAllVariables();
+//        fields = cache.getAllFields();
+//        vars = new ArrayList<>();
+//
 //        for (LocalVariable v : localVars) {
 //            String[] rowData = {v.name()};
 //            leftTableModel.addRow(rowData);
@@ -123,12 +109,12 @@ public class FootPrintToolWindow {
 //            leftTableModel.addRow(rowData);
 //            vars.add(f);
 //        }
-
-        leftTable.setVisible(true);
-
-        if (leftTableSelection != -1) {
-            leftTable.setRowSelectionInterval(leftTableSelection, leftTableSelection);
-        }
+//
+//        leftTable.setVisible(true);
+//
+//        if (leftTableSelection != -1) {
+//            leftTable.setRowSelectionInterval(leftTableSelection, leftTableSelection);
+//        }
 
     }
 
@@ -139,22 +125,20 @@ public class FootPrintToolWindow {
      * @param leftTableVarIndex
      */
     private void updateRightTable(int leftTableVarIndex) {
-        if (leftTableVarIndex == -1)
-            return;
-        DefaultTableModel rightTableModel = (DefaultTableModel)rightTable.getModel();
-        //set visible to false to avoid a race condition
-        rightTable.setVisible(false);
-        rightTableModel.setRowCount(0);
-        Object leftTableVariable = vars.get(leftTableVarIndex);
-
-        List<VariableInfo> history = cache.getHistory(leftTableVariable);
-        for(int i = 0; i < history.size(); i++) {
-            Object[] rowData = {history.get(i).getLine(), history.get(i).getValue()};
-            rightTableModel.addRow(rowData);
-        }
-        rightTable.setVisible(true);
-
-
+//        if (leftTableVarIndex == -1)
+//            return;
+//        DefaultTableModel rightTableModel = (DefaultTableModel)rightTable.getModel();
+//        //set visible to false to avoid a race condition
+//        rightTable.setVisible(false);
+//        rightTableModel.setRowCount(0);
+//        Object leftTableVariable = vars.get(leftTableVarIndex);
+//
+//        List<VariableInfo> history = cache.getHistory(leftTableVariable);
+//        for(int i = 0; i < history.size(); i++) {
+//            Object[] rowData = {history.get(i).getLine(), history.get(i).getValue()};
+//            rightTableModel.addRow(rowData);
+//        }
+//        rightTable.setVisible(true);
     }
 
     /**

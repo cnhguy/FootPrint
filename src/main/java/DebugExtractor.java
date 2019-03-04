@@ -76,17 +76,20 @@ public class DebugExtractor implements DebuggerCommand {
         try {
             StackFrame frame = frameProxy.getStackFrame();
             ObjectReference thisObject = frame.thisObject();
+            String objectId = getObjectId();
+
             if (thisObject != null) {
                 // if the frame is in an object
                 ReferenceType referenceType = thisObject.referenceType();
                 List<Field> fieldList = referenceType.visibleFields();
                 Map<Field, Value> fieldMap = thisObject.getValues(fieldList);
 
+
                 for (Map.Entry<Field, Value> entry : fieldMap.entrySet()) {
                     Field field = entry.getKey();
                     Value val = entry.getValue();
-
-                    cache.put(field, frameProxy.location().lineNumber(), valueAsString(val));
+                    VariableInfo info = new VariableInfo(frameProxy.location().lineNumber(), valueAsString(val));
+                    cache.put(objectId, field, info);
                 }
             } else {
                 // if the frame is in a native or static method
@@ -95,7 +98,9 @@ public class DebugExtractor implements DebuggerCommand {
                 for (Field field : fields) {
 
                     Value value = referenceType.getValue(field);
-                    cache.put(field, frame.location().lineNumber(), valueAsString(value));
+                    VariableInfo info = new VariableInfo(frameProxy.location().lineNumber(), valueAsString(value));
+
+                    cache.put(objectId, field, info);
                 }
             }
         } catch (EvaluateException e) {
@@ -119,7 +124,8 @@ public class DebugExtractor implements DebuggerCommand {
                 // If the value is an array, print it out in array format --> [x, y, z]
                 valueAsString = getValueFromArrayReference((ArrayReferenceImpl) value);
             } else if (value instanceof ObjectReference) {
-                valueAsString = getValueFromObjectReference((ObjectReference) value);
+//                valueAsString = getValueFromObjectReference((ObjectReference) value);
+                valueAsString = invokeToString((ObjectReference) value);
             }
         }
         return valueAsString;
@@ -221,7 +227,7 @@ public class DebugExtractor implements DebuggerCommand {
             try {
                 VariableInfo info = new VariableInfo(frameProxy.location().lineNumber(), valueAsString(val));
                 String objectId = getObjectId();
-                String method = frameProxy.location().method().name();
+                Method method = frameProxy.location().method();
                 cache.put(objectId, method, var, info);
             } catch (Exception e) {
                 e.printStackTrace();
