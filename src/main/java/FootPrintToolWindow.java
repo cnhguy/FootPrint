@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.table.DefaultTableModel;
 
+import static com.intellij.icons.AllIcons.Graph.Layout;
+
 
 /**
  * Manages the ToolWindow's content, i.e. what is displayed in the tool window.
@@ -32,6 +34,7 @@ public class FootPrintToolWindow {
     private JTable variableTable;
     private JScrollPane infoScrollPane;
     private JTable infoTable;
+    //private JButton hideToolWindowButton;
 
 
     /**
@@ -59,9 +62,9 @@ public class FootPrintToolWindow {
         objectTable= new JBTable(new DefaultTableModel(new String[]{"Object"}, 0));
         objectTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         objectTable.setRowSelectionAllowed(true);
-        objectTable.getSelectionModel().addListSelectionListener(om -> updateMethodTable(objectTable.getSelectedRow()));
-        objectTable.getSelectionModel().addListSelectionListener(ov -> updateVariableTable(objectTable.getSelectedRow(),methodTable.getSelectedRow()));
-        objectTable.getSelectionModel().addListSelectionListener(oi-> updateInfoTable(objectTable.getSelectedRow(), methodTable.getSelectedRow(), variableTable.getSelectedRow()));
+        objectTable.getSelectionModel().addListSelectionListener(e -> updateMethodTable(objectTable.getSelectedRow()));
+        objectTable.getSelectionModel().addListSelectionListener(e -> updateVariableTable(objectTable.getSelectedRow(),methodTable.getSelectedRow()));
+        objectTable.getSelectionModel().addListSelectionListener(e -> updateInfoTable(objectTable.getSelectedRow(), methodTable.getSelectedRow(), variableTable.getSelectedRow()));
         objectScrollPane=new JBScrollPane(objectTable);
         content.add(objectScrollPane);
 
@@ -69,8 +72,8 @@ public class FootPrintToolWindow {
         methodTable= new JBTable(new DefaultTableModel(new String[]{"Method"},0));
         methodTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         methodTable.setRowSelectionAllowed(true);
-        methodTable.getSelectionModel().addListSelectionListener(mv -> updateVariableTable(objectTable.getSelectedRow(),methodTable.getSelectedRow()));
-        methodTable.getSelectionModel().addListSelectionListener(mi -> updateInfoTable(objectTable.getSelectedRow(),methodTable.getSelectedRow(),variableTable.getSelectedRow()));
+        methodTable.getSelectionModel().addListSelectionListener(e -> updateVariableTable(objectTable.getSelectedRow(),methodTable.getSelectedRow()));
+        methodTable.getSelectionModel().addListSelectionListener(e -> updateInfoTable(objectTable.getSelectedRow(),methodTable.getSelectedRow(),variableTable.getSelectedRow()));
         methodScrollPane=new JBScrollPane(methodTable);
         content.add(methodScrollPane);
 
@@ -78,7 +81,7 @@ public class FootPrintToolWindow {
         variableTable = new JBTable(new DefaultTableModel(new String[]{"Variables"}, 0));
         variableTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         variableTable.setRowSelectionAllowed(true);
-        variableTable.getSelectionModel().addListSelectionListener(vi -> updateInfoTable(objectTable.getSelectedRow(), methodTable.getSelectedRow(), variableTable.getSelectedRow()));
+        variableTable.getSelectionModel().addListSelectionListener(e -> updateInfoTable(objectTable.getSelectedRow(), methodTable.getSelectedRow(), variableTable.getSelectedRow()));
         variableScrollPane = new JBScrollPane(variableTable);
         content.add(variableScrollPane);
 
@@ -86,6 +89,8 @@ public class FootPrintToolWindow {
         infoTable = new JBTable(new DefaultTableModel(new String[]{"Line","Value"}, 0));
         infoScrollPane = new JBScrollPane(infoTable);
         content.add(infoScrollPane);
+
+        //hideToolWindowButton.addActionListener(e -> FootPrintToolWindow.hide(null));
 
 
     }
@@ -142,14 +147,19 @@ public class FootPrintToolWindow {
         for(int i = 0; i < objects.size(); i++) {
             String[] rowData = {objects.get(i)};
             objectTableModel.addRow(rowData);
+            System.out.println(rowData);
         }
-        variableTable.setVisible(true);
+        objectTable.setVisible(true);
         if (objectTableSelection != -1) {
             objectTable.setRowSelectionInterval(objectTableSelection, objectTableSelection);
         }
 
     }
 
+    /**
+     * Update the Method Table according to the object selection
+     * @param omTableIndex
+     */
     private void updateMethodTable(int omTableIndex) {
         if (omTableIndex == -1)
             return;
@@ -173,6 +183,11 @@ public class FootPrintToolWindow {
         }
     }
 
+    /**
+     * UPDATE THE VARIABLE TABLE ACCORDING TO OBJECTID AND METHODS
+     * @param ovTableIndex
+     * @param mvTableIndex
+     */
 
     private void updateVariableTable(int ovTableIndex, int mvTableIndex) {
         if (ovTableIndex == -1 || mvTableIndex==-1)
@@ -199,31 +214,46 @@ public class FootPrintToolWindow {
             variableTableModel.addRow(rowData);
             vars.add(f);
         }
-
         variableTable.setVisible(true);
-
         if (variableTableSelection != -1) {
             variableTable.setRowSelectionInterval(variableTableSelection, variableTableSelection);
         }
 
     }
 
-
+    /**
+     * UPDATE THE INFOTABLE ACCORDING TO THE OBJECTS,METHODS AND VARIABLES
+     * @param oiTableIndex
+     * @param miTableIndex
+     * @param viTableIndex
+     */
     private void updateInfoTable(int oiTableIndex, int miTableIndex, int viTableIndex) {
         if (oiTableIndex==-1 || miTableIndex==-1 || viTableIndex == -1)
             return;
         DefaultTableModel infoTableModel = (DefaultTableModel)infoTable.getModel();
-//        //set visible to false to avoid a race condition
+        //set visible to false to avoid a race condition
         infoTable.setVisible(false);
         infoTableModel.setRowCount(0);
+        //get the index
         String oiObject = objects.get(oiTableIndex);
         Method miMethod = methods.get(miTableIndex);
         Object viVariable = vars.get(viTableIndex);
-//
+        //store the history list
         history = cache.getHistory(oiObject,miMethod,viVariable);
+        //display
         for(int i = 0; i < history.size(); i++) {
-            Object[] rowData = {history.get(i).getLine(), history.get(i).getValue()};
-            infoTableModel.addRow(rowData);
+            if(history.get(i).getValue().contains("\n")){
+                String[] splitString= history.get(i).getValue().split("\\\n");
+                //char[] charValue = history.get(i).getValue().toCharArray();
+                for(int j=0; j< splitString.length; j++) {
+                    Object[] rowDataSpecial = {history.get(i).getLine(), splitString[j]};
+                    infoTableModel.addRow(rowDataSpecial);
+                }
+            }
+            else{
+                Object[] rowData = {history.get(i).getLine(), history.get(i).getValue()};
+                infoTableModel.addRow(rowData);
+            }
         }
         infoTable.setVisible(true);
     }

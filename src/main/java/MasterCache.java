@@ -2,10 +2,7 @@ import com.sun.jdi.Field;
 import com.sun.jdi.LocalVariable;
 import com.sun.jdi.Method;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class MasterCache {
     private Map<String, Map<Method, DebugCache>> objects;
@@ -120,7 +117,9 @@ public class MasterCache {
      * @return list of fields associated with an objectID
      */
     public List<Field> getAllFields(String objectID) {
-        return fields.get(objectID).getAllFields();
+        DebugCache localfield = fields.get(objectID);
+        if ( localfield==null) return Collections.emptyList();
+        return localfield.getAllFields();
     }
 
     /**
