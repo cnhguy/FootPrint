@@ -123,12 +123,12 @@ public class DebugCache {
     public String toString() {
         String res = "CACHE:\n\n";
         for(LocalVariable var : vars.keySet()) {
-            res += var.name() + "\n";
-            res += vars.get(var).toString() + "\n\n";
+            res += "\t\t\t" + var.name() + "\n";
+            res += "\t\t\t" + vars.get(var).toString() + "\n\n";
         }
         for(Field f : fields.keySet()) {
-            res += f.name() + "\n";
-            res += fields.get(f).toString() + "\n\n";
+            res += "\t\t\t" + f.name() + "\n";
+            res += "\t\t\t" + fields.get(f).toString() + "\n\n";
         }
         return res;
     }

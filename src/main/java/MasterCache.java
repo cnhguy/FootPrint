@@ -105,6 +105,42 @@ public class MasterCache {
     }
 
     /**
+     * Returns a list of local variables associated with an objectID and method
+     * @param objectID objectID
+     * @param method method
+     * @return list of local variables associated with an objectID and method
+     */
+    public List<LocalVariable> getAllLocalVariables(String objectID, Method method) {
+        return objects.get(objectID).get(method).getAllVariables();
+    }
+
+    /**
+     * Returns a list of fields associated with an objectID
+     * @param objectID objectID
+     * @return list of fields associated with an objectID
+     */
+    public List<Field> getAllFields(String objectID) {
+        return fields.get(objectID).getAllFields();
+    }
+
+    /**
+     * Returns the history of a local variable or field
+     * @param objectID object the local variable is in
+     * @param method method the local variable is in
+     * @param var local variable or field
+     * @return the history of a local variable or field
+     */
+    public List<VariableInfo> getHistory(String objectID, Method method, Object var) {
+        if (var instanceof LocalVariable) {
+            return objects.get(objectID).get(method).getHistory(var);
+        } else {
+            return fields.get(objectID).getHistory(var);
+        }
+    }
+
+    // use the following methods if you want to interact with the lower level cache yourself
+
+    /**
      * Returns a lower level cache that maps local variables to their histories
      * @param objectID object the local variables are in
      * @param method method the local variables are in
