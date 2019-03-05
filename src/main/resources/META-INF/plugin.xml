@@ -19,7 +19,7 @@
                     icon="AllIcons.General.IjLogo"
                     factoryClass="FootPrintToolWindowFactory" />
     </extensions>
-        <idea-version since-build="181"/>
+        <idea-version since-build="181"/> <!-- intelliJ 2018.1+ -->
     <actions>
         <action id="FootPrintDebugAction" class="DebugAction" text="FootPrintDebug"
                 description="Debug With FootPrint">
