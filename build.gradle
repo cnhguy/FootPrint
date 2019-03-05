@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'com.footprint'
-version '1.0-SNAPSHOT'
+version '0.1'
 
 sourceCompatibility = 1.8
 
@@ -19,11 +19,11 @@ dependencies {
 
 intellij {
     version '2018.3.3'
+    pluginName 'FootPrint'
+    intellij.updateSinceUntilBuild false
 }
 patchPluginXml {
-    changeNotes """
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>"""
+    changeNotes "Initial version; incomplete. Variable values only collected during suspension"
 }
 
 intellij {
