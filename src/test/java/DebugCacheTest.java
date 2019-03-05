@@ -5,8 +5,8 @@ public class DebugCacheTest {
 
     @Before
     public void setUp() {
-        DebugCache cache = DebugCache.getInstance();
-        cache.clear();
+//        DebugCache cache = DebugCache.getInstance();
+//        cache.clear();
     }
 
     @Test
