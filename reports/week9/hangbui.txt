@@ -1,0 +1,21 @@
+1) Goals from last week:
+- Implement revised UI to include two more columns (classes and methods)
+- Restructure cache to reflect the UI change
+- Test cache and extractor for the back end
+
+2) Progress:
+
+- Restructured the cache to reflect UI change. Our cache is now composed
+of two layers that maps objectID --> methods --> local variables --> histories
+to provide better data organization for the client. The first layer
+is a cache that maps objectID to methods. The second layer then maps the
+methods to their respective DebugCache (that maps local variables --> histories).
+This cache is transferred over to the UI team to implement the new UI mockup.
+- Setup performance test to automate timing pre-processing time. I wrote a Timer class
+that times the execution of a method from the beginning to end and outputs
+the result in milliseconds to a text file.
+
+3) Goals for next week:
+- Test cache and extractor for the back end
+- Fix line number bug (line numbers currently are off by 1)
+- Deploy the FootPrint to IntelliJ's to begin user testing
