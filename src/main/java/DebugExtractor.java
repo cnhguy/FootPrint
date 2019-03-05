@@ -119,47 +119,10 @@ public class DebugExtractor implements DebuggerCommand {
                 // If the value is an array, print it out in array format --> [x, y, z]
                 valueAsString = getValueFromArrayReference((ArrayReferenceImpl) value);
             } else if (value instanceof ObjectReference) {
-                valueAsString = getValueFromObjectReference((ObjectReference) value);
+                valueAsString = invokeToString((ObjectReference) value);
             }
         }
         return valueAsString;
-    }
-
-    /**
-     * Get the object reference's value. If the object belongs to java.*, returns
-     * the toString() result; otherwise represent it as its fields
-     * @param object object to extract
-     * @return object's string representation
-     */
-    private String getValueFromObjectReference(ObjectReference object) {
-        ReferenceType referenceType = object.referenceType();
-
-        if (referenceType.toString().contains("java.")) {
-            // if the object is of java.*, invoke the toString() method
-            return invokeToString(object);
-        } else {
-            // else, represent it as its fields
-            return getFieldsAsString(object);
-        }
-    }
-
-    /**
-     * Returns the fields within an object as a string
-     * @param object object whose field to extract
-     * @return the fields within an object
-     */
-    private String getFieldsAsString(ObjectReference object) {
-        String fieldsAsString = "";
-        ReferenceType referenceType = object.referenceType();
-        List<Field> fieldList = referenceType.visibleFields();
-        Map<Field, Value> fieldMap = object.getValues(fieldList);
-
-        for (Map.Entry<Field, Value> entry : fieldMap.entrySet()) {
-            Field field = entry.getKey();
-            Value val = entry.getValue();
-            fieldsAsString += "\n" + field.name() + ": " + valueAsString(val) + "     ";
-        }
-        return fieldsAsString;
     }
 
     /**
