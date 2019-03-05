@@ -63,8 +63,8 @@ public class FootPrintToolWindow {
         objectTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         objectTable.setRowSelectionAllowed(true);
         objectTable.getSelectionModel().addListSelectionListener(e -> updateMethodTable(objectTable.getSelectedRow()));
-        objectTable.getSelectionModel().addListSelectionListener(e -> updateVariableTable(objectTable.getSelectedRow(),methodTable.getSelectedRow()));
-        objectTable.getSelectionModel().addListSelectionListener(e -> updateInfoTable(objectTable.getSelectedRow(), methodTable.getSelectedRow(), variableTable.getSelectedRow()));
+//        objectTable.getSelectionModel().addListSelectionListener(e -> updateVariableTable(objectTable.getSelectedRow(),methodTable.getSelectedRow()));
+//        objectTable.getSelectionModel().addListSelectionListener(e -> updateInfoTable(objectTable.getSelectedRow(), methodTable.getSelectedRow(), variableTable.getSelectedRow()));
         objectScrollPane=new JBScrollPane(objectTable);
         content.add(objectScrollPane);
 
@@ -73,7 +73,7 @@ public class FootPrintToolWindow {
         methodTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         methodTable.setRowSelectionAllowed(true);
         methodTable.getSelectionModel().addListSelectionListener(e -> updateVariableTable(objectTable.getSelectedRow(),methodTable.getSelectedRow()));
-        methodTable.getSelectionModel().addListSelectionListener(e -> updateInfoTable(objectTable.getSelectedRow(),methodTable.getSelectedRow(),variableTable.getSelectedRow()));
+        // methodTable.getSelectionModel().addListSelectionListener(e -> updateInfoTable(objectTable.getSelectedRow(),methodTable.getSelectedRow(),variableTable.getSelectedRow()));
         methodScrollPane=new JBScrollPane(methodTable);
         content.add(methodScrollPane);
 
@@ -174,7 +174,7 @@ public class FootPrintToolWindow {
         methods=cache.getAllMethods(omObjectID);
         //display
         for(int i = 0; i < methods.size(); i++) {
-            String[] rowData = {methods.get(i).toString()};
+            String[] rowData = {methods.get(i).name()};
             methodTableModel.addRow(rowData);
         }
         methodTable.setVisible(true);
@@ -201,6 +201,9 @@ public class FootPrintToolWindow {
         //get, store and display
         String ovObjectID = objects.get(ovTableIndex);
         Method omMethod = methods.get(mvTableIndex);
+
+        System.out.println("ovObjectID: " + ovObjectID);
+        System.out.println("omMethod: " + omMethod);
         localVars = cache.getAllLocalVariables(ovObjectID,omMethod);
         fields = cache.getAllFields(ovObjectID);
         vars = new ArrayList<>();
@@ -228,8 +231,17 @@ public class FootPrintToolWindow {
      * @param viTableIndex
      */
     private void updateInfoTable(int oiTableIndex, int miTableIndex, int viTableIndex) {
-        if (oiTableIndex==-1 || miTableIndex==-1 || viTableIndex == -1)
+        if (oiTableIndex==-1 || miTableIndex==-1)
             return;
+
+        // clear the info table when we switch methods
+        if (viTableIndex == -1) {
+            DefaultTableModel infoTableModel = (DefaultTableModel) infoTable.getModel();
+            infoTable.setVisible(false);
+            infoTableModel.setRowCount(0);
+            return;
+        }
+
         DefaultTableModel infoTableModel = (DefaultTableModel)infoTable.getModel();
         //set visible to false to avoid a race condition
         infoTable.setVisible(false);

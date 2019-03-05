@@ -47,10 +47,6 @@ public class DebugExtractor implements DebuggerCommand {
     public void action() {
         extractFields();
         extractLocalVariables();
-
-        // TODO: Remove
-        System.out.println(cache);
-        System.out.println("---------------");
     }
 
     /**
