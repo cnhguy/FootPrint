@@ -1,0 +1,13 @@
+Goals from Week 7
+-Refine the UI
+-Display the class and methods information
+
+Progress:
+-Right now, the footprint is displaying all the information including objects, methods, variables, line numbers and values in four colomns.
+-I tried to build the plugin window outside the toolwindow bar and customize our own icon but failed. 
+-Tested the new mastercache with the user interface, they worked pretty well together. Now, the user needs to click on the object first, and then choose the methods from the chosen object. Similar with the variable and the value information. Worked well but users have to know the object and the methods they are using in order to check the specific variable. There is a small bug get fixed of getAllMethods() in the mastercache, the object is null under the static methods so that there is a null exception in the getAllMethods(). 
+
+Plans and Goals:
+-Refine the UI with resizeable cell
+-Better have a survey of how the users could check the variable
+
