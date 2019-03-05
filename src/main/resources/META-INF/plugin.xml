@@ -1,11 +1,9 @@
     <idea-plugin>
     <id>com.footprint.footprint-plugin</id>
     <name>FootPrint</name>
-    <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">FootPrint</vendor>
-
+    <vendor email="footprint@uw.edu" url="https://github.com/cnhguy/FootPrint">FootPrint</vendor>
     <description><![CDATA[
-    Enter short description for your plugin here.<br>
-    <em>most HTML tags may be used</em>
+    FootPrint is a simple variable history viewer that integrates with the IntelliJ debugger.<br>
     ]]></description>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
@@ -21,7 +19,7 @@
                     icon="AllIcons.General.IjLogo"
                     factoryClass="FootPrintToolWindowFactory" />
     </extensions>
-
+        <idea-version since-build="181"/> <!-- intelliJ 2018.1+ -->
     <actions>
         <action id="FootPrintDebugAction" class="DebugAction" text="FootPrintDebug"
                 description="Debug With FootPrint">
