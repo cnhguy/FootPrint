@@ -1,10 +1,10 @@
-import com.intellij.debugger.engine.*;
+import com.intellij.debugger.engine.DebugProcessImpl;
+import com.intellij.debugger.engine.SuspendContextImpl;
+import com.intellij.debugger.engine.SuspendManager;
 import com.intellij.debugger.engine.evaluation.EvaluateException;
 import com.intellij.debugger.engine.managerThread.DebuggerCommand;
-import com.intellij.debugger.engine.requests.LocatableEventRequestor;
 import com.intellij.debugger.jdi.StackFrameProxyImpl;
-
-import com.intellij.debugger.ui.breakpoints.FilteredRequestor;
+import com.intellij.ide.ui.EditorOptionsTopHitProvider;
 import com.intellij.openapi.util.Key;
 import com.sun.jdi.*;
 import com.sun.jdi.event.Event;
@@ -12,12 +12,12 @@ import com.sun.jdi.event.EventIterator;
 import com.sun.jdi.event.EventSet;
 import com.sun.jdi.request.BreakpointRequest;
 import com.sun.jdi.request.EventRequest;
+import com.sun.jdi.request.EventRequestManager;
+import com.sun.jdi.request.StepRequest;
 import com.sun.tools.jdi.ArrayReferenceImpl;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -27,20 +27,25 @@ public class DebugExtractor implements DebuggerCommand {
 
     private StackFrameProxyImpl frameProxy;
     private DebugProcessImpl debugProcess;
+    private SuspendContextImpl suspendContext;
+    private List<DebugListener.StepInfo> steps;
+
     private static DebugCache cache;
-    private static SuspendContextImpl suspendContext;
 
     /**
      * Creates a DebugExtractor
      *
      * @param frameProxy stack frame proxy
      * @param suspendContext suspend context
+     * @param steps list of step requests and their original locations
      */
     public DebugExtractor(StackFrameProxyImpl frameProxy,
-                          SuspendContextImpl suspendContext) {
+                          SuspendContextImpl suspendContext,
+                          List<DebugListener.StepInfo> steps) {
         this.frameProxy = frameProxy;
         this.debugProcess = suspendContext.getDebugProcess();
         this.suspendContext = suspendContext;
+        this.steps = steps;
 
         this.cache = DebugCache.getInstance();
     }
@@ -67,13 +72,20 @@ public class DebugExtractor implements DebuggerCommand {
     private void resumeIfOnlyRequestor() {
         SuspendManager suspendManager = debugProcess.getSuspendManager();
         boolean isOnlyEventRequest = true;
+        // this loop detects:
+        // -breakpoint requests
+        // -step requests without method calls
+        // -step requests into method calls
         outer:
         for (SuspendContextImpl context : suspendManager.getEventContexts()) {
+            System.out.println(context);
             EventSet events = context.getEventSet();
             EventIterator eventIterator = events.eventIterator();
             while (eventIterator.hasNext()) {
                 Event e = eventIterator.nextEvent();
+//                System.out.println(e);
                 EventRequest request = e.request();
+//                System.out.println(request);
                 if (request instanceof BreakpointRequest) {
                     Object o = request.getProperty(Key.findKeyByName("Requestor"));
                     if (o != null && o instanceof DebugListener) {
@@ -84,8 +96,40 @@ public class DebugExtractor implements DebuggerCommand {
                 break outer;
             }
         }
+        // check if a step request is met
+        Iterator<DebugListener.StepInfo> iterator = steps.iterator();
+        while (iterator.hasNext()) {
+            DebugListener.StepInfo stepInfo = iterator.next();
+            try {
+                if (stepRequestMet(stepInfo, suspendContext.getFrameProxy().location())) {
+                    isOnlyEventRequest = false;
+                    iterator.remove();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
         if (isOnlyEventRequest)
             suspendManager.resume(suspendContext);
+    }
+
+    private boolean stepRequestMet(DebugListener.StepInfo stepInfo, Location curLocation) {
+        StepRequest stepRequest = stepInfo.stepRequest;
+        switch (stepRequest.depth()) {
+            case StepRequest.STEP_INTO:
+                return true;
+            case StepRequest.STEP_OUT:
+                if (!stepInfo.originalLocation.method().equals(curLocation.method()))
+                    return true;
+                return false;
+            case StepRequest.STEP_OVER:
+                if (stepInfo.originalLocation.method().equals(curLocation.method()))
+                    return true;
+                return false;
+            default:
+                return false;
+        }
     }
 
     /**

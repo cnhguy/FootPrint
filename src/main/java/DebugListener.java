@@ -1,8 +1,5 @@
 import com.intellij.debugger.InstanceFilter;
-import com.intellij.debugger.engine.DebugProcess;
-import com.intellij.debugger.engine.DebugProcessListener;
-import com.intellij.debugger.engine.DebuggerManagerThreadImpl;
-import com.intellij.debugger.engine.SuspendContextImpl;
+import com.intellij.debugger.engine.*;
 import com.intellij.debugger.engine.evaluation.EvaluationContextImpl;
 import com.intellij.debugger.engine.events.SuspendContextCommandImpl;
 import com.intellij.debugger.engine.managerThread.DebuggerCommand;
@@ -10,6 +7,7 @@ import com.intellij.debugger.engine.requests.RequestManagerImpl;
 import com.intellij.debugger.impl.DebuggerContextImpl;
 import com.intellij.debugger.impl.DebuggerContextListener;
 import com.intellij.debugger.impl.DebuggerSession;
+import com.intellij.debugger.impl.PrioritizedTask;
 import com.intellij.debugger.jdi.StackFrameProxyImpl;
 import com.intellij.debugger.jdi.VirtualMachineProxyImpl;
 import com.intellij.debugger.requests.ClassPrepareRequestor;
@@ -22,6 +20,7 @@ import com.sun.jdi.event.ModificationWatchpointEvent;
 import com.sun.jdi.request.*;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -52,6 +51,7 @@ public class DebugListener implements DebuggerContextListener, DebugProcessListe
             DebugCache.getInstance().clear();
             FootPrintToolWindow.getInstance().reset();
         }
+
 //        if (event == DebuggerSession.Event.PAUSE
 //                || event == DebuggerSession.Event.CONTEXT
 //                || event == DebuggerSession.Event.REFRESH
@@ -138,9 +138,13 @@ public class DebugListener implements DebuggerContextListener, DebugProcessListe
         }
     }
 
+
+    // used to keep track of all places where StepRequests where initiated and their requests
+    private List<StepInfo> steps = new ArrayList<>();
+    private Location prevLocation = null;
+
     /**
-     * Callback for Locatable events. If they are ModificationWatchPoint events, then creates an extractor to get the
-     * field's value.
+     * Callback for Locatable events.
      * @param action
      * @param event
      * @return
@@ -148,23 +152,59 @@ public class DebugListener implements DebuggerContextListener, DebugProcessListe
      */
     @Override
     public boolean processLocatableEvent(SuspendContextCommandImpl action, LocatableEvent event) throws EventProcessingException {
-        System.out.println("\nprocess LocatableEvent suspended: " + event.thread().isSuspended());
+//        System.out.println("\nprocess LocatableEvent suspended: " + event.thread().isSuspended());
         if (event instanceof BreakpointEvent) {
             BreakpointEvent breakpointEvent = (BreakpointEvent)event;
-            System.out.println("BreakPointEvent line: " + breakpointEvent.location().lineNumber());
+            System.out.println("\nBreakPointEvent line: " + breakpointEvent.location().lineNumber());
 
             final SuspendContextImpl suspendContext = action.getSuspendContext();
             final StackFrameProxyImpl sfProxy = action.getSuspendContext().getFrameProxy();
 
             if (suspendContext != null && event.thread().isAtBreakpoint()) {
-                System.out.println("extractor run");
-                DebugExtractor extractor = new DebugExtractor(sfProxy, suspendContext);
+//                System.out.println("extractor run");
+                DebugExtractor extractor = new DebugExtractor(sfProxy, suspendContext, steps);
                 DebuggerManagerThreadImpl managerThread = suspendContext.getDebugProcess()
                         .getManagerThread();
                 managerThread.invokeCommand(extractor);
             }
+            try {
+                prevLocation = sfProxy.location();
+            } catch (Exception e) {
+//                e.printStackTrace();
+            }
         }
         return true;
+    }
+
+    /**
+     * Ccallback for when a thread is resumed, after suspension. e.g. after a breakpoint is resumed
+     * @param suspendContext
+     */
+    @Override
+    public void resumed(SuspendContext suspendContext) {
+        System.out.println("DEBUG PROCESS RESUMED");
+        SuspendContextImpl suspendContext1 = (SuspendContextImpl) suspendContext;
+        EventRequestManager eventRequestManager =
+                suspendContext1.getDebugProcess().getVirtualMachineProxy().eventRequestManager();
+        // check if we have step requests. If so, track them
+        for (StepRequest stepRequest : eventRequestManager.stepRequests()) {
+            System.out.println("StepRequest: size: " + stepRequest.size() + " depth: " + stepRequest.depth());
+            steps.add(new StepInfo(prevLocation, stepRequest));
+        }
+    }
+
+    /**
+     * Holds information about a step request including the location it was created at and the
+     * request itself.
+     */
+    public class StepInfo {
+        public final Location originalLocation;
+        public final StepRequest stepRequest;
+
+        public StepInfo(Location originalLocation, StepRequest stepRequest) {
+            this.originalLocation = originalLocation;
+            this.stepRequest = stepRequest;
+        }
     }
 
     /**
