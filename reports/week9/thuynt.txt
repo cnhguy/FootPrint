@@ -1,0 +1,25 @@
+Previous Goals:
+
+- Finish UI, improve organization of variables
+- Set breakpoints under the hood
+- Finalize how we will display values
+- Create integration tests
+- Run the experiments outlined in our report
+
+This Week:
+
+We restructured the class to map based on class and method names in order to
+update the UI. UI team will now work on separating variables in the display.
+We also have the basic breakpoint setting working in simple cases.
+Currently working on deploying FootPrint. We also ran a few people
+through our user study and the results were good so far; it seems like
+students like FootPrint. Also added Likert questions as suggested;
+made for easier analysis of results. Also working on collecting
+more test programs for the pre-processing study.
+
+Current Goals:
+
+- Fix bugs with breakpoints
+- finish reorganizing the UI
+- complete design of pre-processing study
+- deploy FootPrint
