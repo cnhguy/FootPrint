@@ -198,12 +198,11 @@ public class DebugExtractor implements DebuggerCommand {
             StackFrame frame = frameProxy.getStackFrame();
             ObjectReference thisObject = frame.thisObject();
             if (thisObject != null) {
-                return thisObject.toString();
+                return thisObject.referenceType().name() + "(id=" + thisObject.uniqueID() + ")";
             } else {
                 // if the frame is in a native or static method
                 ReferenceType referenceType = frameProxy.location().declaringType();
-                referenceType.toString();
-                return referenceType.signature();
+                return referenceType.name();
             }
         } catch (EvaluateException e) {
             e.printStackTrace();

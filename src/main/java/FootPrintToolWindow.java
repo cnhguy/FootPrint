@@ -202,8 +202,6 @@ public class FootPrintToolWindow {
         String ovObjectID = objects.get(ovTableIndex);
         Method omMethod = methods.get(mvTableIndex);
 
-        System.out.println("ovObjectID: " + ovObjectID);
-        System.out.println("omMethod: " + omMethod);
         localVars = cache.getAllLocalVariables(ovObjectID,omMethod);
         fields = cache.getAllFields(ovObjectID);
         vars = new ArrayList<>();
