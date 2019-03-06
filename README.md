@@ -59,7 +59,7 @@ The user wants to track how the variables `sum` and `i` change throughout the fo
 
 1) In Intellij, navigate to `Settings` and select `Preferences.` 
 2) Select the `Plugins` option
-3) Select `Install JetBrains plugin` and search for FootPrint
+3) Select `Browse Repositories` and search for FootPrint
 4) Select `Install` and confirm. After restarting Intellij, you should now see the FootPrint icon in the upper right hand toolbar next to the Debug button.
 
 You can view FootPrint on JetBrains [here](https://plugins.jetbrains.com/plugin/12051-footprint)
