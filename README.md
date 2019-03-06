@@ -67,10 +67,10 @@ You can view FootPrint on JetBrains [here](https://plugins.jetbrains.com/plugin/
 ## Instructions:
 
 1) Set breakpoints and click the FootPrint icon, found in the upper right next to the regular IntelliJ Debugger icon. This should start a debugging session for most recently executed program
-3) Step through your program as normal; all local variables and fields of the classes you step in will be automatically tracked.
+2) Step through your program as normal; all local variables and fields of the classes you step in will be automatically tracked.
 3) Click on the 'FootPrint' button on the left-hand side of the debugger window.
-5) This opens a separate pane to the upper left of the debugger window, where you should see a list of your selected variables. Clicking on a the name of one of these variables at any point in the debugging process will display their value history along with which line the value was updated from the start of the program up to whichever line you are currently at in the debugger.
-6) When you are finished, you can simply exit FootPrint stopping the debugging session as usual.
+4) This opens a separate pane to the upper left of the debugger window, where you should see a list of your selected variables. Clicking on a the name of one of these variables at any point in the debugging process will display their value history along with which line the value was updated from the start of the program up to whichever line you are currently at in the debugger.
+5) When you are finished, you can simply exit FootPrint stopping the debugging session as usual.
 
 Congrats! You have successfully used FootPrint.
 
