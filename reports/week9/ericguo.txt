@@ -1,0 +1,11 @@
+1. Previous goals:
+    -finish using breakpoints to get local variable states
+    -research other ways to display variables (esp. objects) in the ui
+2. This week I implemented a way to track all changes in all classes/methods 
+   including local variables and field variables. This change allows FootPrint
+   to record the history of ALL variables during a debug session. As a group,
+   we decided on a number of changes to the UI and what information is displayed
+   that make it more clear than our previous approach of displaying fields/variables.
+3. Future goals:
+    -investigate possible changes/alternatives to setting breakpoints everywhere
+     as it might record too much information.
