@@ -6,14 +6,12 @@ import com.sun.jdi.LocalVariable;
 import java.util.*;
 
 /**
- * Cache that holds info about local variables and fields on the stack. Maps the field or variable
+ * Cache that holds histories of local variables or fields. Maps the field or variable
  * to a list of VariableInfo object that holds its previous values
  * and the line number at which those values were assigned. Note that
  * values are only cached if they have changed.
  */
 public class DebugCache {
-
-    private static DebugCache INSTANCE;
 
     /**
      * Map of local variables on the stack
@@ -25,23 +23,10 @@ public class DebugCache {
      */
     private Map<Field, LinkedList<VariableInfo>> fields;
 
-    private DebugCache() {
-        vars = new HashMap<>();
-        fields = new HashMap<>();
+    public DebugCache() {
+        vars = new LinkedHashMap<>();
+        fields = new LinkedHashMap<>();
     }
-
-    /**
-     * Returns an instance of the cache
-     * @return an instance of the cache
-     */
-    public static DebugCache getInstance() {
-        synchronized (DebugCache.class) {
-            if (INSTANCE == null)
-                INSTANCE = new DebugCache();
-            return INSTANCE;
-        }
-    }
-
 
     /**
      * Returns the history of the var
@@ -88,36 +73,34 @@ public class DebugCache {
     /**
      * Adds the given information to the cache.
      * @param var variable
-     * @param line line number
-     * @param value variable's value
+     * @param update updated value
      */
-    public void put(LocalVariable var, Integer line, String value) {
+    public void put(LocalVariable var, VariableInfo update) {
         LinkedList<VariableInfo> info = vars.get(var);
         if (info == null) {
             info = new LinkedList<>();
         }
-        VariableInfo update = new VariableInfo(line, value);
         if (info.size() == 0 || !update.equals(info.getLast())) {
             info.add(update);
             vars.put(var, info);
+            pushChangeToUI();
         }
     }
 
     /**
      * Adds the given information to the cache.
      * @param field field
-     * @param line line number
-     * @param value variable's value
+     * @param update updated value
      */
-    public void put(Field field, Integer line, String value) {
+    public void put(Field field, VariableInfo update) {
         LinkedList<VariableInfo> info = fields.get(field);
         if (info == null) {
             info = new LinkedList<>();
         }
-        VariableInfo update = new VariableInfo(line, value);
         if (info.size() == 0 || !update.equals(info.getLast())) {
             info.add(update);
             fields.put(field, info);
+            pushChangeToUI();
         }
     }
 
@@ -140,12 +123,12 @@ public class DebugCache {
     public String toString() {
         String res = "CACHE:\n\n";
         for(LocalVariable var : vars.keySet()) {
-            res += var.name() + "\n";
-            res += vars.get(var).toString() + "\n\n";
+            res += "\t\t\t" + var.name() + "\n";
+            res += "\t\t\t" + vars.get(var).toString() + "\n\n";
         }
         for(Field f : fields.keySet()) {
-            res += f.name() + "\n";
-            res += fields.get(f).toString() + "\n\n";
+            res += "\t\t\t" + f.name() + "\n";
+            res += "\t\t\t" + fields.get(f).toString() + "\n\n";
         }
         return res;
     }
