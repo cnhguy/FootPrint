@@ -1,0 +1,20 @@
+1. Previous week’s plan:
+ 	-Work on setting breakpoints automatically so that footprint could extract full information
+ 	-Building a better UI to display the information
+
+2. This week’s progress:
+	-Implemented the new UI. We now organize the variables via the objects and methods that they
+	belong to.
+	-Deployed FootPrint plugin to IntelliJ's marketplace
+	-Successfully set breakpoints under the hood. We're able to get histories of all local variables and fields
+	before the user's breakpoint. However, we just have a bug that causes the thread to hang if user tries to
+	step over a call to another method. We are currently looking into a fix for that. This is the final
+	stretch to our implementation.
+
+3. Next week’s plan:
+    -Add more test projects to the test repo
+ 	-Run performance tests and usability tests
+
+4. Meeting agenda:
+   1. Grading criteria for the final product
+   2. User study with TA's
