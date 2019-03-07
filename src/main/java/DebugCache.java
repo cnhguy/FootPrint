@@ -132,4 +132,12 @@ public class DebugCache {
         }
         return res;
     }
+
+    /**
+     * Returns the size of the DebugCache (fields + local vars)
+     * @return size of this
+     */
+    public int size() {
+        return vars.size() + fields.size();
+    }
 }
