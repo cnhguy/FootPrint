@@ -226,13 +226,59 @@ public class DebugExtractor implements DebuggerCommand {
             }
 
             ThreadReference threadRef = frameProxy.threadProxy().getThreadReference();
+
+            List<BreakpointRequest> toStringBreakpoints = getBreakPoints(threadRef.virtualMachine());
+            // disable all breakpoints within toString method(s) so the thread can execute
+            disableBreakPoints(toStringBreakpoints);
+
             Value toString = object.invokeMethod(threadRef, toStringMethod,
                     Collections.EMPTY_LIST, ObjectReference.INVOKE_SINGLE_THREADED);
+
+            // restore breakpoints
+            enableBreakPoints(toStringBreakpoints);
+
             return trimQuotes(toString.toString());
         } catch (Exception e) {
             e.printStackTrace();
         }
         return "";
+    }
+
+    /**
+     * Get all breakpoints within toString() method(s)
+     * @param vm virtual machine
+     * @return all breakpoints within toString method(s)
+     */
+    private List<BreakpointRequest> getBreakPoints(VirtualMachine vm) {
+        List<BreakpointRequest> requests = new ArrayList<>();
+        EventRequestManager manager = vm.eventRequestManager();
+        List<BreakpointRequest> breakpointRequests = manager.breakpointRequests();
+        for (BreakpointRequest breakPoint : breakpointRequests) {
+            if (breakPoint.location().method().name().contains("toString")) {
+                requests.add(breakPoint);
+            }
+        }
+        return requests;
+    }
+
+    /**
+     * Enable breakpoint requests
+     * @param breakpointRequests breakpoint requests
+     */
+    private void enableBreakPoints(List<BreakpointRequest> breakpointRequests) {
+        for (BreakpointRequest bp : breakpointRequests) {
+            bp.enable();
+        }
+    }
+
+    /**
+     * Disable breakpoint requests
+     * @param breakpointRequests breakpoint requests
+     */
+    private void disableBreakPoints(List<BreakpointRequest> breakpointRequests) {
+        for (BreakpointRequest bp : breakpointRequests) {
+            bp.disable();
+        }
     }
 
     /**
