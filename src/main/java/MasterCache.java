@@ -166,6 +166,14 @@ public class MasterCache {
         fields.clear();
     }
 
+    /**
+     * Returns size of the MasterCache (objects + fields)
+     * @return size of this
+     */
+    public int size() {
+        return objects.size() + fields.size();
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
