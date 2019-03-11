@@ -1,0 +1,19 @@
+Previous Goals:
+
+- Fix bugs with breakpoints
+- finish reorganizing the UI
+- complete design of pre-processing study
+- deploy FootPrint
+
+This Week:
+
+We fixed the bug with the breakpoints by altering our invokeToString()
+method. We also ran our complete user study and performance experiment
+and revised our report. We also deployed version 1.0 of FootPrint
+so the current version is now publicly available.
+
+Current Goals:
+
+- Improve minor UI aspects if time permits
+- try to get TA review of FootPrint if possible
+
