@@ -63,8 +63,6 @@ public class FootPrintToolWindow {
         objectTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         objectTable.setRowSelectionAllowed(true);
         objectTable.getSelectionModel().addListSelectionListener(e -> updateMethodTable(objectTable.getSelectedRow()));
-//        objectTable.getSelectionModel().addListSelectionListener(e -> updateVariableTable(objectTable.getSelectedRow(),methodTable.getSelectedRow()));
-//        objectTable.getSelectionModel().addListSelectionListener(e -> updateInfoTable(objectTable.getSelectedRow(), methodTable.getSelectedRow(), variableTable.getSelectedRow()));
         objectScrollPane=new JBScrollPane(objectTable);
         content.add(objectScrollPane);
 
@@ -73,7 +71,6 @@ public class FootPrintToolWindow {
         methodTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         methodTable.setRowSelectionAllowed(true);
         methodTable.getSelectionModel().addListSelectionListener(e -> updateVariableTable(objectTable.getSelectedRow(),methodTable.getSelectedRow()));
-        // methodTable.getSelectionModel().addListSelectionListener(e -> updateInfoTable(objectTable.getSelectedRow(),methodTable.getSelectedRow(),variableTable.getSelectedRow()));
         methodScrollPane=new JBScrollPane(methodTable);
         content.add(methodScrollPane);
 

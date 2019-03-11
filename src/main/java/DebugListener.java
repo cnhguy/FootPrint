@@ -51,23 +51,6 @@ public class DebugListener implements DebuggerContextListener, DebugProcessListe
             MasterCache.getInstance().clear();
             FootPrintToolWindow.getInstance().reset();
         }
-
-//        if (event == DebuggerSession.Event.PAUSE
-//                || event == DebuggerSession.Event.CONTEXT
-//                || event == DebuggerSession.Event.REFRESH
-//                || event == DebuggerSession.Event.REFRESH_WITH_STACK
-//                && debuggerSession.isPaused()) {
-//            final SuspendContextImpl newSuspendContext = newContext.getSuspendContext();
-//            final StackFrameProxyImpl sfProxy = newContext.getFrameProxy();
-//
-//            if (newSuspendContext != null) {
-//                DebugProcess process = debuggerSession.getProcess();
-//                DebugExtractor extractor = new DebugExtractor(sfProxy, process);
-//                DebuggerManagerThreadImpl managerThread = newSuspendContext.getDebugProcess()
-//                        .getManagerThread();
-//                managerThread.invokeCommand(extractor);
-//            }
-//        }
     }
 
     /**
@@ -132,9 +115,11 @@ public class DebugListener implements DebuggerContextListener, DebugProcessListe
         }
         RequestManagerImpl requestManager = (RequestManagerImpl)debuggerProcess.getRequestsManager();
         for (Location loc : executableLines) {
-            BreakpointRequest req = requestManager.createBreakpointRequest(this, loc);
-            req.setSuspendPolicy(EventRequest.SUSPEND_ALL);
-            req.enable();
+            if (!loc.method().name().contains("toString")) {
+                BreakpointRequest req = requestManager.createBreakpointRequest(this, loc);
+                req.setSuspendPolicy(EventRequest.SUSPEND_ALL);
+                req.enable();
+            }
         }
     }
 
