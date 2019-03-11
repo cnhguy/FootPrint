@@ -30,7 +30,7 @@ public class DebugExtractor implements DebuggerCommand {
     private SuspendContextImpl suspendContext;
     private List<DebugListener.StepInfo> steps;
 
-    private static DebugCache cache;
+    private static MasterCache cache;
 
     /**
      * Creates a DebugExtractor
@@ -47,7 +47,7 @@ public class DebugExtractor implements DebuggerCommand {
         this.suspendContext = suspendContext;
         this.steps = steps;
 
-        this.cache = DebugCache.getInstance();
+        this.cache = MasterCache.getInstance();
     }
 
     /**
@@ -57,11 +57,6 @@ public class DebugExtractor implements DebuggerCommand {
     public void action() {
         extractFields();
         extractLocalVariables();
-
-        // TODO: Remove
-//        System.out.println(cache);
-//        System.out.println("---------------");
-
         resumeIfOnlyRequestor();
     }
 
@@ -83,9 +78,7 @@ public class DebugExtractor implements DebuggerCommand {
             EventIterator eventIterator = events.eventIterator();
             while (eventIterator.hasNext()) {
                 Event e = eventIterator.nextEvent();
-//                System.out.println(e);
                 EventRequest request = e.request();
-//                System.out.println(request);
                 if (request instanceof BreakpointRequest) {
                     Object o = request.getProperty(Key.findKeyByName("Requestor"));
                     if (o != null && o instanceof DebugListener) {
@@ -157,16 +150,20 @@ public class DebugExtractor implements DebuggerCommand {
         try {
             StackFrame frame = frameProxy.getStackFrame();
             ObjectReference thisObject = frame.thisObject();
+            String objectId = getObjectId();
+
             if (thisObject != null) {
                 // if the frame is in an object
                 ReferenceType referenceType = thisObject.referenceType();
                 List<Field> fieldList = referenceType.visibleFields();
                 Map<Field, Value> fieldMap = thisObject.getValues(fieldList);
 
+
                 for (Map.Entry<Field, Value> entry : fieldMap.entrySet()) {
                     Field field = entry.getKey();
                     Value val = entry.getValue();
-                    cache.put(field, frameProxy.location().lineNumber(), valueAsString(val));
+                    VariableInfo info = new VariableInfo(frameProxy.location().lineNumber(), valueAsString(val));
+                    cache.put(objectId, field, info);
                 }
             } else {
                 // if the frame is in a native or static method
@@ -175,9 +172,10 @@ public class DebugExtractor implements DebuggerCommand {
                 for (Field field : fields) {
 
                     Value value = referenceType.getValue(field);
-                    cache.put(field, frame.location().lineNumber(), valueAsString(value));
-                }
+                    VariableInfo info = new VariableInfo(frameProxy.location().lineNumber(), valueAsString(value));
 
+                    cache.put(objectId, field, info);
+                }
             }
         } catch (EvaluateException e) {
             e.printStackTrace();
@@ -309,12 +307,31 @@ public class DebugExtractor implements DebuggerCommand {
     private void updateCache(Map<LocalVariable, Value> map) {
         map.forEach(((var, val) -> {
             try {
-                cache.put(var, frameProxy.location().lineNumber(), valueAsString(val));
+                VariableInfo info = new VariableInfo(frameProxy.location().lineNumber(), valueAsString(val));
+                String objectId = getObjectId();
+                Method method = frameProxy.location().method();
+                cache.put(objectId, method, var, info);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }));
-        cache.pushChangeToUI();
+    }
+
+    private String getObjectId() {
+        try {
+            StackFrame frame = frameProxy.getStackFrame();
+            ObjectReference thisObject = frame.thisObject();
+            if (thisObject != null) {
+                return thisObject.referenceType().name() + "(id=" + thisObject.uniqueID() + ")";
+            } else {
+                // if the frame is in a native or static method
+                ReferenceType referenceType = frameProxy.location().declaringType();
+                return referenceType.name();
+            }
+        } catch (EvaluateException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**

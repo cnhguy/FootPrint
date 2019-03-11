@@ -48,7 +48,7 @@ public class DebugListener implements DebuggerContextListener, DebugProcessListe
         System.out.println(event.toString());
         // new debug started, clear the cache
         if (event == DebuggerSession.Event.ATTACHED) {
-            DebugCache.getInstance().clear();
+            MasterCache.getInstance().clear();
             FootPrintToolWindow.getInstance().reset();
         }
 
