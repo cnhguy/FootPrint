@@ -77,7 +77,7 @@ public class ProgramRunner extends GenericDebuggerRunner {
             return null;
         }
 
-        DebugListener debugListener = new DebugListener(debuggerSession);
+        DebugListener debugListener = new DebugListener(excludes);
         debuggerSession.getContextManager().addListener(debugListener);
 
         final DebugProcessImpl debugProcess = debuggerSession.getProcess();
