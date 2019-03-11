@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'com.footprint'
-version '0.1' // update this
+version '1.0' // update this
 
 sourceCompatibility = 1.8
 
@@ -23,7 +23,7 @@ intellij {
     intellij.updateSinceUntilBuild false
 }
 patchPluginXml {
-    changeNotes "Initial version; incomplete. Variable values only collected during suspension"
+    changeNotes "Full variable histories now collected. New UI separates variables by object and method."
 }
 
 intellij {
