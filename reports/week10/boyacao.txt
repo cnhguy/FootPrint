@@ -1,0 +1,11 @@
+Goals from week9 :
+-Refine the UI with resizeable cell
+-Better have a survey of how the users could check the variable
+
+Progress:
+- We worked on the final report
+- We worked on the tests and comperisions between FootPrint and Chronon. We tried 5 test cases in different length and compare the running time.
+- We fixed the breakpoints.
+
+Future goal and plan:
+-Evolute UI if we have time.
