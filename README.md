@@ -1,16 +1,14 @@
 [![Build Status](https://travis-ci.com/cnhguy/FootPrint.svg?branch=master)](https://travis-ci.com/cnhguy/FootPrint)
 
-# FootPrint: Variable History Viewer
-### Current status:
+# FootPrint: A Variable History Viewer
 
-Version 0.1 has been published to the JetBrains repository and is now publicly available.
+![](ui.png)
 
-We have a working UI that tracks the histories of all local variables and fields of classes that are stepped into as the user steps through the debugger.
-This works for both primitives and objects. Objects are displayed via their toString().
+### Current Status:
 
-We are currently working on implementing breakpoints under the hood so we can get variables histories before we reach
-the user's breakpoint. We are also looking into refining our UI so users can have the option to choose what variable they
-want to track and organize those variables according what methods and classes they belong to. 
+Version 1.0 has been published to the JetBrains repository and is now publicly available.
+
+FootPrint tracks the histories of all local variables and fields of classes that are stepped into automatically. This works for both primitives and objects. Objects are displayed via their toString(). Via breakpoints under the hood, FootPrint collects the full history of variables up until where the debugger is suspended. FootPrint's UI separates variables and fields based on class/object and method.
 
 # User Manual
 
@@ -21,39 +19,16 @@ FootPrint is a user-friendly, lightweight, and simple plugin for IntelliJ that a
 ## Example: 
  
 Consider this scenario:
-```
-Line 1: int sum = 0
 
-Line 2: for (int i = 0; i < 6; i++) {
-
-Line 3:    sum += i; 
-    
-Line 4: }
-
-Line 5: System.out.println(sum); 
-```
+![](code.png)
  
 The user wants to track how the variables `sum` and `i` change throughout the for loop. The user first sets debugging breakpoints as normal and starts a debugging session by clicking on the FootPrint icon. The user can debug as usual while FootPrint records the different values that `sum` and `i` were previously assigned (along with line numbers where the change occurred). The histories can be accessed anytime throughout the debugging process. FootPrint will create the following output for their histories:
+
+Selecting sum:
+![](example1.png)
  
-	History:
- 
-		sum:
-		line    value
-		 1       0
-		 3       1
-		 3       3
-		 3       6
-		 3       10
-		 15      3
-		 
-		i:
-		line    value
-		 2       0
-		 2       1
-		 2       2
-		 2       3
-		 2       4
-		 2       5
+Selecting i:
+![](example2.png)
 		 
 ## Installation:
 
@@ -66,11 +41,13 @@ You can view FootPrint on JetBrains [here](https://plugins.jetbrains.com/plugin/
  
 ## Instructions:
 
-1) Set breakpoints and click the FootPrint icon, found in the upper right next to the regular IntelliJ Debugger icon. This should start a debugging session for most recently executed program
+![](zoom.png)
+
+1) Set breakpoints and click the FootPrint icon ![](icon.png), found in the upper right next to the regular IntelliJ Debugger icon. This should start a debugging session for most recently executed program
 2) Step through your program as normal; all local variables and fields of the classes you step in will be automatically tracked.
-3) Click on the 'FootPrint' button on the left-hand side of the debugger window.
-4) This opens a separate pane to the upper left of the debugger window, where you should see a list of your selected variables. Clicking on a the name of one of these variables at any point in the debugging process will display their value history along with which line the value was updated from the start of the program up to whichever line you are currently at in the debugger.
-5) When you are finished, you can simply exit FootPrint by stopping the debugging session as usual.
+3) Click on the 'FootPrint' button on the bottom right. ![](button.png)
+4) This opens a separate pane alongside the debugger window, where you should see a list of your classes, methods of the selected class, and variables in the selected method. Clicking on a the name of one of these variables at any point in the debugging process will display their value history along with which line the value was updated from the start of the program up to whichever line you are currently at in the debugger.
+5) When you are finished, you can simply exit FootPrint by stopping the debugging session as usual. Clicking again on the FootPrint button will also collapse the FootPrint pane.
 
 Congrats! You have successfully used FootPrint.
 
