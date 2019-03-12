@@ -1,5 +1,3 @@
-import com.intellij.openapi.ui.popup.JBPopupFactory;
-import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
 import com.sun.jdi.Field;
@@ -11,9 +9,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.table.DefaultTableModel;
-
-import static com.intellij.icons.AllIcons.Graph.Layout;
-
 
 /**
  * Manages the ToolWindow's content, i.e. what is displayed in the tool window.
@@ -144,7 +139,6 @@ public class FootPrintToolWindow {
         for(int i = 0; i < objects.size(); i++) {
             String[] rowData = {objects.get(i)};
             objectTableModel.addRow(rowData);
-            System.out.println(rowData);
         }
         objectTable.setVisible(true);
         if (objectTableSelection != -1) {
@@ -175,7 +169,7 @@ public class FootPrintToolWindow {
             methodTableModel.addRow(rowData);
         }
         methodTable.setVisible(true);
-        if (methodTableSelection != -1) {
+        if (methodTableSelection != -1 && methodTableSelection < methodTable.getRowCount()) {
             methodTable.setRowSelectionInterval(methodTableSelection, methodTableSelection);
         }
     }
@@ -187,8 +181,10 @@ public class FootPrintToolWindow {
      */
 
     private void updateVariableTable(int ovTableIndex, int mvTableIndex) {
-        if (ovTableIndex == -1 || mvTableIndex==-1)
+        if (ovTableIndex == -1 || mvTableIndex==-1) {
             return;
+        }
+
         DefaultTableModel variableTableModel = (DefaultTableModel)variableTable.getModel();
         //set selection
         int variableTableSelection = variableTable.getSelectedRow();
@@ -202,25 +198,25 @@ public class FootPrintToolWindow {
         localVars = cache.getAllLocalVariables(ovObjectID,omMethod);
         fields = cache.getAllFields(ovObjectID);
         vars = new ArrayList<>();
+        for (Field f : fields) {
+            String[] rowData = {f.name() + " (field)"};
+            variableTableModel.addRow(rowData);
+            vars.add(f);
+        }
         for (LocalVariable v : localVars) {
             String[] rowData = {v.name()};
             variableTableModel.addRow(rowData);
             vars.add(v);
         }
-        for (Field f : fields) {
-            String[] rowData = {f.name()};
-            variableTableModel.addRow(rowData);
-            vars.add(f);
-        }
         variableTable.setVisible(true);
-        if (variableTableSelection != -1) {
+        if (variableTableSelection != -1 && variableTableSelection < variableTable.getRowCount()) {
             variableTable.setRowSelectionInterval(variableTableSelection, variableTableSelection);
         }
 
     }
 
     /**
-     * UPDATE THE INFOTABLE ACCORDING TO THE OBJECTS,METHODS AND VARIABLES
+     * UPDATE THE INFOTABLE ACCORDING TO THE OBJECTS, METHODS, AND VARIABLES
      * @param oiTableIndex
      * @param miTableIndex
      * @param viTableIndex

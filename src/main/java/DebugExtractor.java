@@ -4,8 +4,8 @@ import com.intellij.debugger.engine.SuspendManager;
 import com.intellij.debugger.engine.evaluation.EvaluateException;
 import com.intellij.debugger.engine.managerThread.DebuggerCommand;
 import com.intellij.debugger.jdi.StackFrameProxyImpl;
-import com.intellij.ide.ui.EditorOptionsTopHitProvider;
 import com.intellij.openapi.util.Key;
+
 import com.sun.jdi.*;
 import com.sun.jdi.event.Event;
 import com.sun.jdi.event.EventIterator;
@@ -21,15 +21,33 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Extracts variable information
+ * Extracts variable information from the stack frame
  */
 public class DebugExtractor implements DebuggerCommand {
 
+    /**
+     * Stack frame manager
+     */
     private StackFrameProxyImpl frameProxy;
+
+    /**
+     * Debug process running the virtual machine
+     */
     private DebugProcessImpl debugProcess;
+
+    /**
+     * Program we are suspending
+     */
     private SuspendContextImpl suspendContext;
+
+    /**
+     * User's step requests
+     */
     private List<DebugListener.StepInfo> steps;
 
+    /**
+     * Cache to store all variable histories
+     */
     private static MasterCache cache;
 
     /**
@@ -73,7 +91,6 @@ public class DebugExtractor implements DebuggerCommand {
         // -step requests into method calls
         outer:
         for (SuspendContextImpl context : suspendManager.getEventContexts()) {
-            System.out.println(context);
             EventSet events = context.getEventSet();
             EventIterator eventIterator = events.eventIterator();
             while (eventIterator.hasNext()) {
@@ -140,8 +157,6 @@ public class DebugExtractor implements DebuggerCommand {
             e.printStackTrace();
         }
     }
-
-
 
     /**
      * Extract and cache fields visible to the debugger

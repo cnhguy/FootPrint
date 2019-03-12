@@ -14,15 +14,18 @@ import java.util.*;
 public class DebugCache {
 
     /**
-     * Map of local variables on the stack
+     * Map of local variables to their histories
      */
     private Map<LocalVariable, LinkedList<VariableInfo>> vars;
 
     /**
-     * Map of fields
+     * Map of fields to their histories
      */
     private Map<Field, LinkedList<VariableInfo>> fields;
 
+    /**
+     * Creates a DebugCache instance
+     */
     public DebugCache() {
         vars = new LinkedHashMap<>();
         fields = new LinkedHashMap<>();

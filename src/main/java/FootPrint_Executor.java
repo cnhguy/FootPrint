@@ -19,11 +19,19 @@ public class FootPrint_Executor extends DefaultDebugExecutor{
         return ExecutorRegistry.getInstance().getExecutorById(EXECUTOR_ID);
     }
 
+    /**
+     * Returns an action id
+     * @return an action id
+     */
     @Override
     public String getContextActionId() {
         return "FootPrintDebugClass";
     }
 
+    /**
+     * Returns an executor id
+     * @return executor id
+     */
     @Override
     @NotNull
     public String getId() {
