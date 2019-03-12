@@ -1,5 +1,3 @@
-
-
 import com.sun.jdi.Field;
 import com.sun.jdi.LocalVariable;
 
