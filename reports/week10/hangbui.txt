@@ -1,0 +1,17 @@
+1) Goals from last week:
+- Test cache and extractor for the back end
+- Fix line number bug (line numbers currently are off by 1)
+- Deploy the FootPrint to IntelliJ's to begin user testing
+
+2) Progress:
+
+- Fix breakpoint bug that causes the program to hang
+- Deployed FootPrint version 1.0 that has breakpoints under the hood
+and the updated UI with four columns.
+- Ran runtime experiments that compares Footprint and Chronon on several
+projects from intro CSE classes. However, Footprint is considerably slower
+than we expected so if time permits, we will look into ways to optimize performance
+
+3) Goals for next week:
+- Optimize performance of Footprint if time permits
+- Wrap up report
