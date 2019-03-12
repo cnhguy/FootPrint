@@ -1,0 +1,9 @@
+1. goals:
+    -investigate possible changes/alternatives to setting breakpoints everywhere
+     as it might record too much information.
+2. This week I worked on fixing bugs in setting breakpoints everywhere and 
+   researching the quuestion from last week. Regrading that, I believe setting many
+   breakpoints is the easiest and simplest way to accomplish our goal. I also helped
+   finish the report.
+3. Future goals:
+    -continue working on report
