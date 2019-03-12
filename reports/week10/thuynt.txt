@@ -8,7 +8,9 @@ Previous Goals:
 This Week:
 
 We fixed the bug with the breakpoints by altering our invokeToString()
-method. We also ran our complete user study and performance experiment
+method. We also finished reorganizing the UI
+by refactoring the cache. I added tests for the new MasterCache and updated
+DebugCache. We also ran our complete user study and performance experiment
 and revised our report. We also deployed version 1.0 of FootPrint
 so the current version is now publicly available.
 
