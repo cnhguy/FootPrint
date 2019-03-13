@@ -15,15 +15,18 @@ import javax.swing.table.DefaultTableModel;
 import static com.intellij.icons.AllIcons.Graph.Layout;
 
 
-/**
- * Manages the ToolWindow's content, i.e. what is displayed in the tool window.
- */
+    /**
+    * Manages the ToolWindow's content and display the content of User Interface
+    */
 
 public class FootPrintToolWindow {
     private static FootPrintToolWindow INSTANCE;
-//initilize a cache
+    //initilize a cache
     private final MasterCache cache;
-//Construct the variables of the four tables and the according scrollpane
+    /* Construct the variables of the four tables and the according scrollpane. layout and content are the fields to display
+    objectTable, methodTable, variableTable and infoTable are the four tables displayed in the UI content
+    objectScrollPane, methodsScrollPane, variableScrollPane, infoScrollPane are the according components in UI
+    */
     private GridLayout layout;
     private JPanel content;
     private JScrollPane objectScrollPane;
@@ -34,12 +37,19 @@ public class FootPrintToolWindow {
     private JTable variableTable;
     private JScrollPane infoScrollPane;
     private JTable infoTable;
-    //private JButton hideToolWindowButton;
 
+    /*
+     * Initialize the lists to store the objects, methods, localvariables, fields, variables, and history
+     */
+    private List<String> objects;
+    private List<Method> methods;
+    private List<LocalVariable> localVars;
+    private List<Field> fields;
+    private List<Object> vars;
+    private List<VariableInfo> history;
 
     /**
-     * Returns an instance of the toolwindow
-     * @return
+     * @return Returns an instance of the toolwindow
      */
     public static FootPrintToolWindow getInstance() {
         synchronized (FootPrintToolWindow.class) {
@@ -53,7 +63,7 @@ public class FootPrintToolWindow {
         cache = MasterCache.getInstance();
         initComponents();
     }
-    //Setup the components of the four tables
+    //Setup the components of the user interface
     private void initComponents() {
         layout = new GridLayout(0,4);
         content = new JPanel();
@@ -85,12 +95,7 @@ public class FootPrintToolWindow {
         infoTable = new JBTable(new DefaultTableModel(new String[]{"Line","Value"}, 0));
         infoScrollPane = new JBScrollPane(infoTable);
         content.add(infoScrollPane);
-
-        //hideToolWindowButton.addActionListener(e -> FootPrintToolWindow.hide(null));
-
-
     }
-
     /**
      * Reset the content to the initial state.
      * Before display the tables, the user interface will first clean all the table contents, the logic here is to first hide the tables, clean the tables and then dispaly
@@ -118,20 +123,12 @@ public class FootPrintToolWindow {
         variableTable.setVisible(true);
         infoTable.setVisible(true);
     }
-
-    //Initilize the lists to store the variables
-    private List<String> objects;
-    private List<Method> methods;
-    private List<LocalVariable> localVars;
-    private List<Field> fields;
-    private List<Object> vars;
-    private List<VariableInfo> history;
-
     /**
      * The set DebugCache should call this method to notify this class of a change in the cache and to update accordingly
      * The cacheChanged() will load the object table.
      **/
     public void cacheChanged() {
+        //Initialize the tablemodel to store and display the information
         DefaultTableModel objectTableModel = (DefaultTableModel)objectTable.getModel();
         //set the selection action
         int objectTableSelection = objectTable.getSelectedRow();
@@ -153,15 +150,15 @@ public class FootPrintToolWindow {
         }
 
     }
-
     /**
      * Update the Method Table according to the object selection
-     * @param omTableIndex
+     * @param omTableIndex The index of user selection of Object Table
      */
     private void updateMethodTable(int omTableIndex) {
         // User can generate the table only when there is a selection in the object table
         if (omTableIndex == -1)
             return;
+        //Initialize the tablemodel to store and display the information
         DefaultTableModel methodTableModel = (DefaultTableModel)methodTable.getModel();
         //set selection of the method table
         int methodTableSelection = methodTable.getSelectedRow();
@@ -182,17 +179,16 @@ public class FootPrintToolWindow {
             methodTable.setRowSelectionInterval(methodTableSelection, methodTableSelection);
         }
     }
-
     /**
      * UPDATE THE VARIABLE TABLE ACCORDING TO OBJECTID AND METHODS
-     * @param ovTableIndex
-     * @param mvTableIndex
+     * @param ovTableIndex The index of user selection of Object Table
+     * @param mvTableIndex The index of user selection of Methods Table
      */
-
     private void updateVariableTable(int ovTableIndex, int mvTableIndex) {
         //The variable table is visiable only when the users made selections on the objects and methods
         if (ovTableIndex == -1 || mvTableIndex==-1)
             return;
+        //Initialize the tablemodel to store and display the information
         DefaultTableModel variableTableModel = (DefaultTableModel)variableTable.getModel();
         //get the selection of the variable from users
         int variableTableSelection = variableTable.getSelectedRow();
@@ -223,12 +219,11 @@ public class FootPrintToolWindow {
         }
 
     }
-
     /**
      * UPDATE THE INFOTABLE ACCORDING TO THE OBJECTS,METHODS AND VARIABLES
-     * @param oiTableIndex
-     * @param miTableIndex
-     * @param viTableIndex
+     * @param oiTableIndex The index of the user selection from Object Table
+     * @param miTableIndex The index of the user selection from Methods Table
+     * @param viTableIndex The index of the user selection from Variable Table
      */
     private void updateInfoTable(int oiTableIndex, int miTableIndex, int viTableIndex) {
         if (oiTableIndex==-1 || miTableIndex==-1)
@@ -240,7 +235,6 @@ public class FootPrintToolWindow {
             infoTableModel.setRowCount(0);
             return;
         }
-
         DefaultTableModel infoTableModel = (DefaultTableModel)infoTable.getModel();
         //set visible to false to avoid a race condition
         infoTable.setVisible(false);
@@ -273,9 +267,6 @@ public class FootPrintToolWindow {
         }
         infoTable.setVisible(true);
     }
-
-
-
     /**
      * returns the content to be displayed by the ToolWindow
      * @return
