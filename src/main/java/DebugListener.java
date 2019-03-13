@@ -1,22 +1,24 @@
 import com.intellij.debugger.InstanceFilter;
 import com.intellij.debugger.engine.*;
-import com.intellij.debugger.engine.evaluation.EvaluationContextImpl;
 import com.intellij.debugger.engine.events.SuspendContextCommandImpl;
 import com.intellij.debugger.engine.managerThread.DebuggerCommand;
 import com.intellij.debugger.engine.requests.RequestManagerImpl;
 import com.intellij.debugger.impl.DebuggerContextImpl;
 import com.intellij.debugger.impl.DebuggerContextListener;
 import com.intellij.debugger.impl.DebuggerSession;
-import com.intellij.debugger.impl.PrioritizedTask;
 import com.intellij.debugger.jdi.StackFrameProxyImpl;
 import com.intellij.debugger.jdi.VirtualMachineProxyImpl;
 import com.intellij.debugger.requests.ClassPrepareRequestor;
 import com.intellij.debugger.ui.breakpoints.FilteredRequestor;
 import com.intellij.ui.classFilter.ClassFilter;
-import com.sun.jdi.*;
+
+
+import com.sun.jdi.AbsentInformationException;
+import com.sun.jdi.Location;
+import com.sun.jdi.ReferenceType;
+import com.sun.jdi.ThreadReference;
 import com.sun.jdi.event.BreakpointEvent;
 import com.sun.jdi.event.LocatableEvent;
-import com.sun.jdi.event.ModificationWatchpointEvent;
 import com.sun.jdi.request.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,6 +30,9 @@ import java.util.List;
  */
 public class DebugListener implements DebuggerContextListener, DebugProcessListener, ClassPrepareRequestor, FilteredRequestor {
 
+    /**
+     * List of excluded libraries that Footprint will ignore
+     */
     private String[] excludes;
 
     /**
@@ -45,7 +50,6 @@ public class DebugListener implements DebuggerContextListener, DebugProcessListe
      */
     @Override
     public void changeEvent(@NotNull DebuggerContextImpl newContext, DebuggerSession.Event event) {
-        System.out.println(event.toString());
         // new debug started, clear the cache
         if (event == DebuggerSession.Event.ATTACHED) {
             MasterCache.getInstance().clear();
@@ -83,7 +87,6 @@ public class DebugListener implements DebuggerContextListener, DebugProcessListe
             public void action() {
                 thread.suspend();
                 VirtualMachineProxyImpl vmp = (VirtualMachineProxyImpl) proc.getVirtualMachineProxy();
-                System.out.println("threadstarted vm: " + vmp);
                 setClassPrepareRequest(vmp);
                 thread.resume();
             }
@@ -100,7 +103,6 @@ public class DebugListener implements DebuggerContextListener, DebugProcessListe
      */
     @Override
     public void processClassPrepare(DebugProcess debuggerProcess, ReferenceType referenceType) {
-        System.out.println("process ClassPrepare");
         registerBreakPointRequests(debuggerProcess, referenceType);
     }
 
@@ -137,16 +139,13 @@ public class DebugListener implements DebuggerContextListener, DebugProcessListe
      */
     @Override
     public boolean processLocatableEvent(SuspendContextCommandImpl action, LocatableEvent event) throws EventProcessingException {
-//        System.out.println("\nprocess LocatableEvent suspended: " + event.thread().isSuspended());
         if (event instanceof BreakpointEvent) {
             BreakpointEvent breakpointEvent = (BreakpointEvent)event;
-            System.out.println("\nBreakPointEvent line: " + breakpointEvent.location().lineNumber());
 
             final SuspendContextImpl suspendContext = action.getSuspendContext();
             final StackFrameProxyImpl sfProxy = action.getSuspendContext().getFrameProxy();
 
             if (suspendContext != null && event.thread().isAtBreakpoint()) {
-//                System.out.println("extractor run");
                 DebugExtractor extractor = new DebugExtractor(sfProxy, suspendContext, steps);
                 DebuggerManagerThreadImpl managerThread = suspendContext.getDebugProcess()
                         .getManagerThread();
@@ -155,25 +154,23 @@ public class DebugListener implements DebuggerContextListener, DebugProcessListe
             try {
                 prevLocation = sfProxy.location();
             } catch (Exception e) {
-//                e.printStackTrace();
+                e.printStackTrace();
             }
         }
         return true;
     }
 
     /**
-     * Ccallback for when a thread is resumed, after suspension. e.g. after a breakpoint is resumed
+     * Callback for when a thread is resumed, after suspension. e.g. after a breakpoint is resumed
      * @param suspendContext
      */
     @Override
     public void resumed(SuspendContext suspendContext) {
-        System.out.println("DEBUG PROCESS RESUMED");
         SuspendContextImpl suspendContext1 = (SuspendContextImpl) suspendContext;
         EventRequestManager eventRequestManager =
                 suspendContext1.getDebugProcess().getVirtualMachineProxy().eventRequestManager();
         // check if we have step requests. If so, track them
         for (StepRequest stepRequest : eventRequestManager.stepRequests()) {
-            System.out.println("StepRequest: size: " + stepRequest.size() + " depth: " + stepRequest.depth());
             steps.add(new StepInfo(prevLocation, stepRequest));
         }
     }

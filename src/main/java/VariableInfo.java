@@ -1,14 +1,3 @@
-import com.sun.jdi.Field;
-import com.sun.jdi.ObjectReference;
-import com.sun.jdi.ReferenceType;
-import com.sun.jdi.Value;
-import com.sun.tools.jdi.ArrayReferenceImpl;
-import com.sun.tools.jdi.ObjectReferenceImpl;
-import com.sun.tools.jdi.StringReferenceImpl;
-
-import java.util.List;
-import java.util.Map;
-
 /**
  * Variable info holds a value and the line number at which it was assigned.
  */

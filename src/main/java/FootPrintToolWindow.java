@@ -1,5 +1,3 @@
-import com.intellij.openapi.ui.popup.JBPopupFactory;
-import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
 import com.sun.jdi.Field;
@@ -11,14 +9,12 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.table.DefaultTableModel;
-
 import static com.intellij.icons.AllIcons.Graph.Layout;
 
 
     /**
     * Manages the ToolWindow's content and display the content of User Interface
     */
-
 public class FootPrintToolWindow {
     private static FootPrintToolWindow INSTANCE;
     //initilize a cache
@@ -141,7 +137,6 @@ public class FootPrintToolWindow {
         for(int i = 0; i < objects.size(); i++) {
             String[] rowData = {objects.get(i)};
             objectTableModel.addRow(rowData);
-            System.out.println(rowData);
         }
         //Display the objectTable
         objectTable.setVisible(true);
@@ -175,7 +170,7 @@ public class FootPrintToolWindow {
         }
         //display the method table
         methodTable.setVisible(true);
-        if (methodTableSelection != -1) {
+        if (methodTableSelection != -1 && methodTableSelection < methodTable.getRowCount()) {
             methodTable.setRowSelectionInterval(methodTableSelection, methodTableSelection);
         }
     }
@@ -202,11 +197,17 @@ public class FootPrintToolWindow {
         localVars = cache.getAllLocalVariables(ovObjectID,omMethod);
         fields = cache.getAllFields(ovObjectID);
         vars = new ArrayList<>();
+        for (Field f : fields) {
+            String[] rowData = {f.name() + " (field)"};
+            variableTableModel.addRow(rowData);
+            vars.add(f);
+        }
         for (LocalVariable v : localVars) {
             String[] rowData = {v.name()};
             variableTableModel.addRow(rowData);
             vars.add(v);
         }
+
         for (Field f : fields) {
             String[] rowData = {f.name()};
             variableTableModel.addRow(rowData);
@@ -214,13 +215,13 @@ public class FootPrintToolWindow {
         }
         //display the variable table
         variableTable.setVisible(true);
-        if (variableTableSelection != -1) {
+        if (variableTableSelection != -1 && variableTableSelection < variableTable.getRowCount()) {
             variableTable.setRowSelectionInterval(variableTableSelection, variableTableSelection);
         }
 
     }
     /**
-     * UPDATE THE INFOTABLE ACCORDING TO THE OBJECTS,METHODS AND VARIABLES
+     * Update the info table according to the selected object, method, and variable
      * @param oiTableIndex The index of the user selection from Object Table
      * @param miTableIndex The index of the user selection from Methods Table
      * @param viTableIndex The index of the user selection from Variable Table
@@ -267,6 +268,7 @@ public class FootPrintToolWindow {
         }
         infoTable.setVisible(true);
     }
+  
     /**
      * returns the content to be displayed by the ToolWindow
      * @return
@@ -275,16 +277,3 @@ public class FootPrintToolWindow {
         return content;
    }
 }
-
-    /* In the user interface, we could make further improve under the following features
-        The first possible feature is that we can display our user interface in a quicker way. In the current approach
-        we basically reload all the information of the objects, methods, and variables every time there is a change in
-        the cache. This may lead to a possible time lag and display issue if the user is dealing with a large program or
-        the user uses footprint to record program with long runtime. A possible approach is to modify the cache so that
-        every time there is an update in the cache, the user interface only needs to listen to the most recent update
-        from the cache.
-        The second possible feature is that there could be a color change accordingly whenever there is a change in the
-        cache. Say, there is a change in the variable x in line 15. The objects x belongs to, the methods called related
-        vairable x and the latest changed row will display a color. Right now, we are not adding this feature is that
-        this feature will have a better display after the cache is modified.
-     */
