@@ -3,6 +3,7 @@ import com.intellij.debugger.engine.SuspendContextImpl;
 import com.intellij.debugger.engine.SuspendManager;
 import com.intellij.debugger.engine.evaluation.EvaluateException;
 import com.intellij.debugger.engine.managerThread.DebuggerCommand;
+import com.intellij.debugger.impl.PrioritizedTask;
 import com.intellij.debugger.jdi.StackFrameProxyImpl;
 import com.intellij.ide.ui.EditorOptionsTopHitProvider;
 import com.intellij.openapi.util.Key;
@@ -18,6 +19,7 @@ import com.sun.tools.jdi.ArrayReferenceImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 /**
@@ -29,8 +31,11 @@ public class DebugExtractor implements DebuggerCommand {
     private DebugProcessImpl debugProcess;
     private SuspendContextImpl suspendContext;
     private List<DebugListener.StepInfo> steps;
+    private DebugListener debugListener;
 
-    private static MasterCache cache;
+    private TrackToStringThreads threadTracker;
+    private MasterCache cache;
+    private AtomicBoolean restartExecution = new AtomicBoolean(true);
 
     /**
      * Creates a DebugExtractor
@@ -41,12 +46,15 @@ public class DebugExtractor implements DebuggerCommand {
      */
     public DebugExtractor(StackFrameProxyImpl frameProxy,
                           SuspendContextImpl suspendContext,
-                          List<DebugListener.StepInfo> steps) {
+                          List<DebugListener.StepInfo> steps,
+                          DebugListener debugListener) {
         this.frameProxy = frameProxy;
         this.debugProcess = suspendContext.getDebugProcess();
         this.suspendContext = suspendContext;
         this.steps = steps;
+        this.debugListener = debugListener;
 
+        this.threadTracker = new TrackToStringThreads(debugListener.skipBreakpoints, restartExecution);
         this.cache = MasterCache.getInstance();
     }
 
@@ -57,6 +65,7 @@ public class DebugExtractor implements DebuggerCommand {
     public void action() {
         extractFields();
         extractLocalVariables();
+        threadTracker.setFinishedAddingThreads(true);
         resumeIfOnlyRequestor();
     }
 
@@ -103,8 +112,17 @@ public class DebugExtractor implements DebuggerCommand {
             }
         }
 
-        if (isOnlyEventRequest)
-            suspendManager.resume(suspendContext);
+        if (isOnlyEventRequest) {
+            if (restartExecution.get()) {
+                System.out.println("debug extractor resume");
+                suspendManager.resume(suspendContext);
+            } else {
+                threadTracker.resumeExecutionOnAllThreadsFinished(() ->
+                        debugProcess.getManagerThread().invoke(PrioritizedTask.Priority.HIGH,
+                                () -> suspendManager.resume(suspendContext))
+                );
+            }
+        }
     }
 
     private boolean stepRequestMet(DebugListener.StepInfo stepInfo, Location curLocation) {
@@ -170,11 +188,12 @@ public class DebugExtractor implements DebuggerCommand {
                 ReferenceType referenceType = frameProxy.location().declaringType();
                 List<Field> fields = referenceType.fields();
                 for (Field field : fields) {
+                    if (field.isStatic()) {
+                        Value value = referenceType.getValue(field);
+                        VariableInfo info = new VariableInfo(frameProxy.location().lineNumber(), valueAsString(value));
 
-                    Value value = referenceType.getValue(field);
-                    VariableInfo info = new VariableInfo(frameProxy.location().lineNumber(), valueAsString(value));
-
-                    cache.put(objectId, field, info);
+                        cache.put(objectId, field, info);
+                    }
                 }
             }
         } catch (EvaluateException e) {
@@ -217,66 +236,31 @@ public class DebugExtractor implements DebuggerCommand {
             // find the toString() method with no argument
             Method toStringMethod = null;
             for (Method m : methods) {
-                if (m.argumentTypeNames().size() == 0) {
+                if (m.argumentTypeNames().size() == 0 && m.returnTypeName().equals("java.lang.String")) {
                     toStringMethod = m;
                     break;
                 }
             }
+            final Method finalToStringMethod = toStringMethod;
 
             ThreadReference threadRef = frameProxy.threadProxy().getThreadReference();
 
-            List<BreakpointRequest> toStringBreakpoints = getBreakPoints(threadRef.virtualMachine());
-            // disable all breakpoints within toString method(s) so the thread can execute
-            disableBreakPoints(toStringBreakpoints);
+            Thread getToString = new Thread(() -> {
+                try {
+                    Value toString = object.invokeMethod(threadRef, finalToStringMethod,
+                            Collections.EMPTY_LIST, 0);
+                    System.out.println(toString.toString());
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+            });
+            threadTracker.addThreadAndStart(getToString);
 
-            Value toString = object.invokeMethod(threadRef, toStringMethod,
-                    Collections.EMPTY_LIST, ObjectReference.INVOKE_SINGLE_THREADED);
-
-            // restore breakpoints
-            enableBreakPoints(toStringBreakpoints);
-
-            return trimQuotes(toString.toString());
+            return "<GETTING VALUE>";
         } catch (Exception e) {
             e.printStackTrace();
         }
         return "";
-    }
-
-    /**
-     * Get all breakpoints within toString() method(s)
-     * @param vm virtual machine
-     * @return all breakpoints within toString method(s)
-     */
-    private List<BreakpointRequest> getBreakPoints(VirtualMachine vm) {
-        List<BreakpointRequest> requests = new ArrayList<>();
-        EventRequestManager manager = vm.eventRequestManager();
-        List<BreakpointRequest> breakpointRequests = manager.breakpointRequests();
-        for (BreakpointRequest breakPoint : breakpointRequests) {
-            if (breakPoint.location().method().name().contains("toString")) {
-                requests.add(breakPoint);
-            }
-        }
-        return requests;
-    }
-
-    /**
-     * Enable breakpoint requests
-     * @param breakpointRequests breakpoint requests
-     */
-    private void enableBreakPoints(List<BreakpointRequest> breakpointRequests) {
-        for (BreakpointRequest bp : breakpointRequests) {
-            bp.enable();
-        }
-    }
-
-    /**
-     * Disable breakpoint requests
-     * @param breakpointRequests breakpoint requests
-     */
-    private void disableBreakPoints(List<BreakpointRequest> breakpointRequests) {
-        for (BreakpointRequest bp : breakpointRequests) {
-            bp.disable();
-        }
     }
 
     /**

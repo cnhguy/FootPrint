@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Listens for when the debugger session is paused (i.e. it is at a breakpoint)
@@ -127,6 +128,7 @@ public class DebugListener implements DebuggerContextListener, DebugProcessListe
     // used to keep track of all places where StepRequests where initiated and their requests
     private List<StepInfo> steps = new ArrayList<>();
     private Location prevLocation = null;
+    public AtomicBoolean skipBreakpoints = new AtomicBoolean(false);
 
     /**
      * Callback for Locatable events.
@@ -139,6 +141,8 @@ public class DebugListener implements DebuggerContextListener, DebugProcessListe
     public boolean processLocatableEvent(SuspendContextCommandImpl action, LocatableEvent event) throws EventProcessingException {
 //        System.out.println("\nprocess LocatableEvent suspended: " + event.thread().isSuspended());
         if (event instanceof BreakpointEvent) {
+            if (skipBreakpoints.get())
+                return true;
             BreakpointEvent breakpointEvent = (BreakpointEvent)event;
             System.out.println("\nBreakPointEvent line: " + breakpointEvent.location().lineNumber());
 
@@ -147,7 +151,7 @@ public class DebugListener implements DebuggerContextListener, DebugProcessListe
 
             if (suspendContext != null && event.thread().isAtBreakpoint()) {
 //                System.out.println("extractor run");
-                DebugExtractor extractor = new DebugExtractor(sfProxy, suspendContext, steps);
+                DebugExtractor extractor = new DebugExtractor(sfProxy, suspendContext, steps, this);
                 DebuggerManagerThreadImpl managerThread = suspendContext.getDebugProcess()
                         .getManagerThread();
                 managerThread.invokeCommand(extractor);
