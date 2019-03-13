@@ -23,7 +23,7 @@ public class FootPrintToolWindow {
     private static FootPrintToolWindow INSTANCE;
 //initilize a cache
     private final MasterCache cache;
-//Construct the variables
+//Construct the variables of the four tables and the according scrollpane
     private GridLayout layout;
     private JPanel content;
     private JScrollPane objectScrollPane;
@@ -38,7 +38,7 @@ public class FootPrintToolWindow {
 
 
     /**
-     * Returns an instance of this
+     * Returns an instance of the toolwindow
      * @return
      */
     public static FootPrintToolWindow getInstance() {
@@ -53,20 +53,19 @@ public class FootPrintToolWindow {
         cache = MasterCache.getInstance();
         initComponents();
     }
-    //Setup the components
+    //Setup the components of the four tables
     private void initComponents() {
         layout = new GridLayout(0,4);
         content = new JPanel();
         content.setLayout(layout);
-
+    // Set the Object table with a listener passing value to the updateMethodTable
         objectTable= new JBTable(new DefaultTableModel(new String[]{"Object"}, 0));
         objectTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         objectTable.setRowSelectionAllowed(true);
         objectTable.getSelectionModel().addListSelectionListener(e -> updateMethodTable(objectTable.getSelectedRow()));
         objectScrollPane=new JBScrollPane(objectTable);
         content.add(objectScrollPane);
-
-
+    //Set the Method Table with a listener passing value to the updateVariableTable
         methodTable= new JBTable(new DefaultTableModel(new String[]{"Method"},0));
         methodTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         methodTable.setRowSelectionAllowed(true);
@@ -74,7 +73,7 @@ public class FootPrintToolWindow {
         methodScrollPane=new JBScrollPane(methodTable);
         content.add(methodScrollPane);
 
-
+    //Set the Variable Table with a listener passing value to the updateInforTable
         variableTable = new JBTable(new DefaultTableModel(new String[]{"Variables"}, 0));
         variableTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         variableTable.setRowSelectionAllowed(true);
@@ -82,7 +81,7 @@ public class FootPrintToolWindow {
         variableScrollPane = new JBScrollPane(variableTable);
         content.add(variableScrollPane);
 
-
+    //Set the Info Table to display the ultimate line numbner and the variable value
         infoTable = new JBTable(new DefaultTableModel(new String[]{"Line","Value"}, 0));
         infoScrollPane = new JBScrollPane(infoTable);
         content.add(infoScrollPane);
@@ -94,6 +93,7 @@ public class FootPrintToolWindow {
 
     /**
      * Reset the content to the initial state.
+     * Before display the tables, the user interface will first clean all the table contents, the logic here is to first hide the tables, clean the tables and then dispaly
      */
     public void reset() {
         objectTable.setVisible(false);
@@ -119,7 +119,7 @@ public class FootPrintToolWindow {
         infoTable.setVisible(true);
     }
 
-    //Initilize the lists
+    //Initilize the lists to store the variables
     private List<String> objects;
     private List<Method> methods;
     private List<LocalVariable> localVars;
@@ -129,23 +129,24 @@ public class FootPrintToolWindow {
 
     /**
      * The set DebugCache should call this method to notify this class of a change in the cache and to update accordingly
-     * The cacheChanges() will load the left table.
+     * The cacheChanged() will load the object table.
      **/
     public void cacheChanged() {
         DefaultTableModel objectTableModel = (DefaultTableModel)objectTable.getModel();
-        //set selection
+        //set the selection action
         int objectTableSelection = objectTable.getSelectedRow();
        //set visible to false to avoid a race condition
         objectTable.setVisible(false);
         objectTableModel.setRowCount(0);
-        //store
+        //store the objects value to the list objects
         objects = cache.getAllObjects();
-        //display
+        //display the object table using a loop
         for(int i = 0; i < objects.size(); i++) {
             String[] rowData = {objects.get(i)};
             objectTableModel.addRow(rowData);
             System.out.println(rowData);
         }
+        //Display the objectTable
         objectTable.setVisible(true);
         if (objectTableSelection != -1) {
             objectTable.setRowSelectionInterval(objectTableSelection, objectTableSelection);
@@ -158,22 +159,24 @@ public class FootPrintToolWindow {
      * @param omTableIndex
      */
     private void updateMethodTable(int omTableIndex) {
+        // User can generate the table only when there is a selection in the object table
         if (omTableIndex == -1)
             return;
         DefaultTableModel methodTableModel = (DefaultTableModel)methodTable.getModel();
-        //set selection
+        //set selection of the method table
         int methodTableSelection = methodTable.getSelectedRow();
         //set visible to false to avoid a race condition
         methodTable.setVisible(false);
         methodTableModel.setRowCount(0);
-        //get and store
+        //get the object selected and store the methods accordingly
         String omObjectID = objects.get(omTableIndex);
         methods=cache.getAllMethods(omObjectID);
-        //display
+        //build the methodstable through a loop
         for(int i = 0; i < methods.size(); i++) {
             String[] rowData = {methods.get(i).name()};
             methodTableModel.addRow(rowData);
         }
+        //display the method table
         methodTable.setVisible(true);
         if (methodTableSelection != -1) {
             methodTable.setRowSelectionInterval(methodTableSelection, methodTableSelection);
@@ -187,18 +190,19 @@ public class FootPrintToolWindow {
      */
 
     private void updateVariableTable(int ovTableIndex, int mvTableIndex) {
+        //The variable table is visiable only when the users made selections on the objects and methods
         if (ovTableIndex == -1 || mvTableIndex==-1)
             return;
         DefaultTableModel variableTableModel = (DefaultTableModel)variableTable.getModel();
-        //set selection
+        //get the selection of the variable from users
         int variableTableSelection = variableTable.getSelectedRow();
         //set visible to false to avoid a race condition
         variableTable.setVisible(false);
         variableTableModel.setRowCount(0);
-        //get, store and display
+        //listen to the selection both from the objects and the methods
         String ovObjectID = objects.get(ovTableIndex);
         Method omMethod = methods.get(mvTableIndex);
-
+        //get local variables and fields seperately
         localVars = cache.getAllLocalVariables(ovObjectID,omMethod);
         fields = cache.getAllFields(ovObjectID);
         vars = new ArrayList<>();
@@ -212,6 +216,7 @@ public class FootPrintToolWindow {
             variableTableModel.addRow(rowData);
             vars.add(f);
         }
+        //display the variable table
         variableTable.setVisible(true);
         if (variableTableSelection != -1) {
             variableTable.setRowSelectionInterval(variableTableSelection, variableTableSelection);
@@ -228,8 +233,7 @@ public class FootPrintToolWindow {
     private void updateInfoTable(int oiTableIndex, int miTableIndex, int viTableIndex) {
         if (oiTableIndex==-1 || miTableIndex==-1)
             return;
-
-        // clear the info table when we switch methods
+        // The info table is only visible only when the users made selections on the objects, methods, and variables
         if (viTableIndex == -1) {
             DefaultTableModel infoTableModel = (DefaultTableModel) infoTable.getModel();
             infoTable.setVisible(false);
@@ -250,7 +254,12 @@ public class FootPrintToolWindow {
         //display
         for(int i = 0; i < history.size(); i++) {
             if(history.get(i).getValue().contains("\n")){
+                // If the string contains escape symbol, divide the string into multiple lines
                 String[] splitString= history.get(i).getValue().split("\\\n");
+                StringBuffer fatString = null;
+                for(int j=0; j<splitString.length;j++ ){
+                    fatString.append(splitString[j]);
+                }
                 //char[] charValue = history.get(i).getValue().toCharArray();
                 for(int j=0; j< splitString.length; j++) {
                     Object[] rowDataSpecial = {history.get(i).getLine(), splitString[j]};
@@ -275,3 +284,16 @@ public class FootPrintToolWindow {
         return content;
    }
 }
+
+    /* In the user interface, we could make further improve under the following features
+        The first possible feature is that we can display our user interface in a quicker way. In the current approach
+        we basically reload all the information of the objects, methods, and variables every time there is a change in
+        the cache. This may lead to a possible time lag and display issue if the user is dealing with a large program or
+        the user uses footprint to record program with long runtime. A possible approach is to modify the cache so that
+        every time there is an update in the cache, the user interface only needs to listen to the most recent update
+        from the cache.
+        The second possible feature is that there could be a color change accordingly whenever there is a change in the
+        cache. Say, there is a change in the variable x in line 15. The objects x belongs to, the methods called related
+        vairable x and the latest changed row will display a color. Right now, we are not adding this feature is that
+        this feature will have a better display after the cache is modified.
+     */
