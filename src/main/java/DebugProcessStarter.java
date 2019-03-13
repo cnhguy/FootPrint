@@ -7,6 +7,7 @@ import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebugProcessStarter;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.impl.XDebugSessionImpl;
+
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -14,9 +15,21 @@ import org.jetbrains.annotations.NotNull;
  */
 public class DebugProcessStarter extends XDebugProcessStarter {
 
+    /**
+     * Debug process running the virtual machine
+     */
     private DebugProcessImpl debugProcess;
+
+    /**
+     * Debug session we are in
+     */
     private DebuggerSession debuggerSession;
 
+    /**
+     * Creates a DebugProcessStarter instance
+     * @param debugProcess Debug process to run the virtual machine
+     * @param debuggerSession Debug session we are in
+     */
     public DebugProcessStarter(DebugProcessImpl debugProcess, DebuggerSession debuggerSession) {
         this.debugProcess = debugProcess;
         this.debuggerSession = debuggerSession;

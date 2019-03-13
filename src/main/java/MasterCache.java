@@ -4,12 +4,28 @@ import com.sun.jdi.Method;
 
 import java.util.*;
 
+/**
+ * Master cache maps object instances to methods that were called. Each methods
+ * has their own DebugCache that stores their local variables and histories.
+ * Master Cache also keeps track of objects and their fields
+ */
 public class MasterCache {
+    /**
+     * Maps objects to methods to DebugCache containing local variables and their histories
+     */
     private Map<String, Map<Method, DebugCache>> objects;
+
+    /**
+     * Maps objects to fields and their histories
+     */
     private Map<String, DebugCache> fields;
 
+    /**
+     * Singleton instance of MasterCache
+     */
     private static MasterCache INSTANCE;
 
+    // private constructor for MasterCache
     private MasterCache() {
         objects = new HashMap<>();
         fields = new HashMap<>();
@@ -62,26 +78,6 @@ public class MasterCache {
         fieldCache.put(field, info);
         fields.put(object, fieldCache);
     }
-
-//    /**
-//     * Returns the object's method cache. Method cache maps a method's name to another
-//     * lower level cache (called DebugCache). The De
-//     * @param object
-//     * @return
-//     */
-//    public Map<String, DebugCache> getMethodCache(String object) {
-//        Map<String, DebugCache> methodCache = objects.get(object);
-//        return methodCache;
-//    }
-//
-//    public DebugCache getVarsCache(String object, String method) {
-//        Map<String, DebugCache> methodCache = this.getMethodCache(object);
-//        return methodCache.get(method);
-//    }
-//
-//    public DebugCache getFieldsCache(String object) {
-//        return fields.get(object);
-//    }
 
     /**
      * Returns a list of loaded class/object ids
