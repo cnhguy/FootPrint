@@ -1,0 +1,18 @@
+1. Previous week’s plan:
+-Add more test projects to the test repo
+-Run performance tests and usability tests
+
+2. This week’s progress:
+- We worked on the final report 
+- Fixed the bugs in breakpoints
+- Finished UI
+- Finalized the test suite
+- Deploy FootPrint V1.0
+- Conducted performance tests and usability tests
+
+3. Current Goals:
+- Evolute minor UI componenets if time permits
+
+4. Agenda
+- Results from Performance Tests
+- Wrapup with FootPrint project
