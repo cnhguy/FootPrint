@@ -32,7 +32,7 @@ Selecting i:
 		 
 ## Installation:
 
-1) In Intellij, navigate to `Settings` and select `Preferences.` 
+1) In IntelliJ, navigate to `Preferences` or `Settings.`
 2) Select the `Plugins` option
 3) Select `Browse Repositories` and search for FootPrint
 4) Select `Install` and confirm. After restarting Intellij, you should now see the FootPrint icon in the upper right hand toolbar next to the Debug button.
